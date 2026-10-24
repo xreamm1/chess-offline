@@ -30,7 +30,7 @@ jobs:
           npm ci --no-audit --no-fund
           npm run android:prepare
       - name: Build test APK
-        run: gradle -p android assembleDebug assembleDebugAndroidTest lintDebug -PappVersionCode=${{ github.run_number }} --stacktrace
+        run: gradle -p android :app:assembleDebug :app:assembleDebugAndroidTest :app:lintDebug -PappVersionCode=${{ github.run_number }} --stacktrace
       - name: Enable emulator acceleration
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -49,7 +49,7 @@ jobs:
           script: |
             adb shell svc wifi disable
             adb shell svc data disable
-            gradle -p android connectedDebugAndroidTest --stacktrace
+            gradle -p android :app:connectedDebugAndroidTest --stacktrace
             adb pull /sdcard/Android/data/io.github.xreamm1.chessoffline/files/offline-test.png android/offline-test.png
       - name: Save diagnostics
         if: always()
