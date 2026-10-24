@@ -260,6 +260,16 @@ export function search(
       DONE_SCORE[i] = ROOT_SCORE[i]!
       DONE_BOUND[i] = ROOT_BOUND[i]!
     }
+    // Optional measured iteration output; it never evaluates or searches another node.
+    const observe = (globalThis as any).__damkaIteration
+    if (typeof observe === 'function') {
+      const line: number[] = []
+      for (let k = 0; k < Math.min(count, 6); k++) {
+        const idx = DONE_IDX[k]!, at = idx * MOVE_SLOTS
+        line.push(STACK[at]!, STACK[at + 1]!, DONE_SCORE[idx]!, DONE_BOUND[idx]!)
+      }
+      observe({ depth, score: best, nodes, root: line })
+    }
   }
 
   const root = new Int32Array(count * ROOT_SLOTS)
