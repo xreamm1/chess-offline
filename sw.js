@@ -1,0 +1,5 @@
+const CACHE='chess-offline-v3.9.0-pages-1';
+const allowed=new Set(['index.html','stockfish19.wasm.gz']);
+self.addEventListener('install',event=>event.waitUntil((async()=>{const cache=await caches.open(CACHE);await cache.add(new Request('./index.html',{cache:'reload'}));await self.skipWaiting()})()));
+self.addEventListener('activate',event=>event.waitUntil((async()=>{await self.clients.claim();for(const name of await caches.keys())if(name.startsWith('chess-offline-v')&&name!==CACHE)await caches.delete(name)})()));
+self.addEventListener('fetch',event=>{const url=new URL(event.request.url),scope=new URL(self.registration.scope);if(event.request.method!=='GET'||url.origin!==scope.origin||!url.pathname.startsWith(scope.pathname))return;let file=url.pathname.slice(scope.pathname.length)||'index.html';if(!allowed.has(file))return;const key=new URL(file,scope).href;event.respondWith((async()=>{const cache=await caches.open(CACHE),cached=await cache.match(key);if(cached)return cached;const response=await fetch(event.request);if(response.ok)event.waitUntil(cache.put(key,response.clone()).catch(()=>{}));return response})())});

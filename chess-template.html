@@ -1,0 +1,1194 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#312e2b"><title>Chess Offline — шахматы в самолёте</title>
+<style>
+:root{color-scheme:dark;--bg:#312e2b;--panel:#262421;--muted:#a6a39e;--green:#81b64c;--light:#eeeed2;--dark:#769656}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#efeeec;font:15px system-ui,-apple-system,Segoe UI,sans-serif}button,select{font:inherit}button{cursor:pointer;border:0;color:inherit}button:focus-visible,select:focus-visible{outline:3px solid #b6df78;outline-offset:3px}header{height:84px;max-width:1320px;margin:auto;display:flex;align-items:center;justify-content:space-between;padding:0 30px}.brand{background:none;font-size:27px;font-weight:850;letter-spacing:-1px;display:flex;align-items:center;gap:9px}.brand span{color:var(--green);font-size:40px}.brand small{font-size:12px;letter-spacing:2px;color:var(--muted);margin-left:9px;font-weight:600}.offline{font-size:12px;color:#b4c8a3;background:#3c4432;border:1px solid #526341;border-radius:20px;padding:7px 12px}.offline:before{content:'●';color:#9aca63;margin-right:7px}main{max-width:1260px;margin:0 auto;display:grid;grid-template-columns:minmax(300px,760px) 350px;gap:28px;padding:12px 30px 40px}.player{height:60px;display:flex;align-items:center;gap:11px}.avatar{display:grid;place-items:center;background:#47433e;border-radius:8px;width:42px;height:42px;font-size:27px}.player strong{display:block;font-size:15px}.player small{color:var(--muted);font-size:12px}.turn-chip{margin-left:auto;color:#ccc8c2;font-size:12px}.board-frame{position:relative;aspect-ratio:1;box-shadow:0 12px 26px #0004;border-radius:5px;overflow:hidden}.board{width:100%;height:100%;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));grid-template-rows:repeat(8,minmax(0,1fr))}.square{position:relative;background:var(--light);padding:0;border-radius:0;display:grid;place-items:center;touch-action:manipulation}.square.dark{background:var(--dark)}.square.last{background:#f5f682}.square.dark.last{background:#b9ca45}.square.selected{background:#f4ce65}.square.hint{box-shadow:inset 0 0 0 5px #24bfe0}.square.check{background:radial-gradient(#e04a40 10%,#bc5447 55%,var(--dark))}.piece{width:88%;height:88%;pointer-events:none;filter:drop-shadow(0 2px 1px #0005);z-index:2}.dot{position:absolute;width:26%;height:26%;background:#0003;border-radius:50%;z-index:3;pointer-events:none}.capture{position:absolute;inset:4%;border:6px solid #0003;border-radius:50%;z-index:3;pointer-events:none}.coord{position:absolute;font-size:clamp(9px,1vw,13px);font-weight:750;color:var(--dark);z-index:4;pointer-events:none}.dark .coord{color:var(--light)}.rank{left:5px;top:3px}.file{right:5px;bottom:2px}.board-tools{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;margin-top:14px}.board-tools button{margin-left:auto}.icon-btn{background:#45413c;padding:9px 13px;border-radius:6px}.sidebar{margin-top:60px;background:var(--panel);border-radius:12px;overflow:hidden;align-self:start;box-shadow:0 8px 25px #0002}.tabs{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #ffffff0b;padding:7px;gap:4px}.tab{background:none;color:#a9a6a0;font-size:13px;font-weight:650;padding:12px 4px;border-radius:6px}.tab.active{background:#3d3933;color:#fff}.content{padding:24px}.eyebrow{font-size:11px;color:var(--green);font-weight:800;letter-spacing:1.8px}h1{font-size:26px;letter-spacing:-.6px;margin:8px 0 10px}p{color:var(--muted);line-height:1.6;font-size:13px}.bot-card{background:#312e2b;padding:18px;border-radius:9px;margin:22px 0;display:flex;gap:14px;align-items:center}.bot-face{font-size:39px}.bot-card strong{display:block}.bot-card small{display:block;color:var(--muted);margin-top:5px;font-size:12px}label{display:block;font-size:13px;color:#c3c0ba;margin:17px 0 8px}select{width:100%;background:#3d3934;color:#fff;border:1px solid #514b44;border-radius:6px;padding:11px}.primary{width:100%;background:var(--green);box-shadow:0 4px 0 #507b2c;border-radius:7px;font-weight:800;font-size:17px;padding:15px;margin:23px 0 12px;text-shadow:0 1px #0003}.primary:hover{background:#91c65c}.secondary{background:#3d3934;border-radius:6px;padding:11px 14px;width:100%;margin-top:9px;font-weight:650}.status{padding:18px 24px;border-top:1px solid #ffffff0b;min-height:75px;font-weight:650;font-size:14px;line-height:1.5}.status small{display:block;color:var(--muted);font-weight:400;font-size:12px;margin-top:3px}.pane[hidden]{display:none}.moves{max-height:360px;overflow:auto;min-height:140px}.move-row{display:grid;grid-template-columns:34px 1fr 1fr;padding:9px;border-radius:4px;font:14px ui-monospace,monospace}.move-row:nth-child(odd){background:#ffffff05}.move-row span:first-child{color:var(--muted)}.setting{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0}.setting input{accent-color:var(--green);width:18px;height:18px}.note{font-size:11px;color:#8c8881;margin-top:20px;line-height:1.6}.secret{color:#c9ed98;border:1px solid #81b64c;background:#36432c}.promotion{position:absolute;inset:0;background:#0009;z-index:10;display:grid;place-items:center}.promotion[hidden]{display:none}.promotion-box{background:#312e2b;border-radius:12px;padding:20px;text-align:center}.choices{display:flex;gap:5px;margin-top:15px}.choices button{width:60px;height:65px;background:#eeeed2;border-radius:6px}.choices svg{width:100%;height:100%}.moving{position:fixed;pointer-events:none;z-index:50;transition:transform .19s ease-out}.moving svg{width:100%;height:100%}footer{text-align:center;color:#817d76;font-size:11px;padding-bottom:20px}@media(min-width:1250px){main{grid-template-columns:minmax(300px,760px) 350px}}@media(max-width:850px){header{height:70px;padding:0 16px}.brand{font-size:22px}.brand small{display:none}main{padding:0 14px 24px;grid-template-columns:1fr;gap:20px;max-width:650px}.sidebar{margin-top:0}.content{padding:20px}.player{height:53px}.board-tools{margin-top:10px}.tabs{grid-template-columns:repeat(4,1fr)}.tab{font-size:11px}.offline{font-size:10px;padding:6px 9px}h1{font-size:23px}.moves{max-height:220px}}@media(prefers-reduced-motion:reduce){.moving{transition:none}}
+
+:root{--bg:#242421;--panel:#242421;--muted:#94948b;--green:#94af75;--light:#e6e5cd;--dark:#788b61}body{font-size:14px;-webkit-tap-highlight-color:transparent}header{height:52px;max-width:560px;padding:0 14px}.brand{font-size:18px;letter-spacing:-.3px;font-weight:650;gap:6px;padding:0}.brand span{font-size:25px}.brand small,.offline,.eyebrow,.bot-card,footer{display:none}.version{background:none;color:#96968a;font:12px ui-monospace,monospace;padding:12px 0 12px 18px;min-height:44px;touch-action:manipulation;user-select:none}main{display:block;max-width:560px;padding:0 10px 24px}.player{height:46px;gap:9px}.avatar{background:none;width:28px;height:32px;border-radius:0;font-size:27px}.player strong{font-size:13px;font-weight:600}.player small{font-size:11px}.turn-chip{font-size:11px;color:#bfcaaa}.board-frame{border-radius:2px;box-shadow:none}.board-tools{margin:3px 0 8px;min-height:44px}.board-tools>span{font-size:11px}.icon-btn{min-width:44px;min-height:44px;border-radius:3px;background:none;font-size:22px;padding:5px 10px}.sidebar{margin:0;background:transparent;box-shadow:none;border-radius:0;display:flex;flex-direction:column}.status{order:-1;padding:9px 0 13px;min-height:43px;font-size:13px;font-weight:500;border-top:1px solid #ffffff12}.status small{display:none}.tabs{padding:0;gap:0;grid-template-columns:repeat(4,1fr);border-bottom:1px solid #ffffff17}.tab{font-size:12px;font-weight:500;padding:13px 2px;border-radius:0;min-height:45px;border-bottom:2px solid transparent}.tab.active{background:none;border-bottom-color:var(--green);color:#dce7ce}.content{padding:14px 0}h1{font-size:16px;letter-spacing:0;font-weight:600;margin:0 0 12px}p{font-size:12px;margin:8px 0;line-height:1.5}.pane>p.note{font-size:11px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}label{font-size:12px;margin:0 0 7px}select{border:1px solid #ffffff19;background:#30302b;border-radius:4px;min-height:44px;padding:10px;font-size:14px}.primary{margin:14px 0 4px;box-shadow:none;text-shadow:none;background:#829b63;color:#fff;font-size:14px;font-weight:600;border-radius:4px;min-height:46px;padding:12px}.primary:hover{background:#91aa72}.secondary{font-size:13px;font-weight:500;min-height:44px;border-radius:4px;background:#34342e;padding:11px}.setting{min-height:48px;margin:0;padding:10px 0;border-bottom:1px solid #ffffff0c}.setting input{width:21px;height:21px}.note{margin-top:12px}.secret{background:#303b29;border:1px solid #738b57;color:#dbeaca}.coord{font-size:10px}.rank{left:3px;top:2px}.file{right:3px;bottom:1px}.square.hint{box-shadow:inset 0 0 0 3px #deb44f}.piece{filter:drop-shadow(0 1px 1px #0004);width:90%;height:90%}.moves{max-height:200px;min-height:70px}.promotion-box{border-radius:6px}.connection{border-top:1px solid #ffffff19;margin-top:18px;padding-top:16px}.connection h2{font-size:14px;font-weight:600;margin:0 0 9px}.connection details>summary{padding:12px 0;cursor:pointer;color:#c5c5b9;font-size:12px}.connection textarea{display:block;width:100%;min-height:76px;resize:vertical;background:#191a17;color:#d8dccf;border:1px solid #ffffff25;border-radius:3px;padding:9px;font:11px ui-monospace,monospace}.connection .pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}.connection .pair button{margin-top:5px}.net-status{font-size:12px;color:#baca9d;white-space:pre-line;min-height:20px}.connection label{margin-top:12px}.connection[aria-busy=true] button:not(#disconnect){opacity:.5;pointer-events:none}button:disabled{opacity:.35;cursor:default}[hidden]{display:none!important}@media(min-width:900px){header{max-width:1040px;height:64px}main{max-width:1040px;display:grid;grid-template-columns:minmax(350px,620px) 310px;gap:30px;padding:0 20px 30px}.sidebar{margin-top:46px}.player{height:46px}.tabs{grid-template-columns:1fr 1fr}.content{padding-top:18px}.board-tools{margin-top:7px}}@media(max-width:360px){main{padding-inline:5px}.tab{font-size:11px}.choices button{width:52px}.board-tools>span{font-size:10px}}@media(max-height:500px) and (orientation:landscape){header{max-width:900px}main{display:grid;grid-template-columns:minmax(240px,1fr) 280px;gap:18px;max-width:900px}.board-frame{max-width:calc(100dvh - 160px);min-width:240px;margin:auto}.sidebar{margin-top:0}.tabs{grid-template-columns:1fr 1fr}}
+.board-tools #hintButton{width:auto;margin:0 auto 0 0;padding:8px 12px;min-height:40px;font-size:12px}.board-tools:has(#hintButton:not([hidden]))>span{display:none}:root{--light:#e4e8c8;--dark:#779556}.board-frame{border-radius:0;box-shadow:none}.coord{display:none}.piece{width:100%;height:100%;filter:drop-shadow(0 1px 1px #0004)}.square{overflow:hidden}.analysis{font-size:12px;line-height:1.7;white-space:pre-line;color:#d3d9c5;padding:10px 0 12px;border-top:1px solid #ffffff15;font-variant-numeric:tabular-nums}.square.hint{box-shadow:inset 0 0 0 3px #ead364;background:#d8d77c}.square.dark.hint{background:#b2bc55}.licenses{font-size:11px;color:var(--muted);margin-top:18px}.licenses a{color:#b9c7a7}.licenses pre{white-space:pre-wrap;font-size:10px;max-height:160px;overflow:auto}#qrCode{display:block;width:min(100%,340px);height:auto;margin:14px auto 6px;background:white;image-rendering:pixelated}.qr-caption{text-align:center;font-size:11px;color:#bfc5ad;margin:8px 0 12px}.photo-button{text-align:center;margin-top:5px!important;cursor:pointer}.connection #qrScanner{margin-top:12px}.connection video{display:block;width:100%;max-height:300px;object-fit:cover;background:#111}.connection #signalOut{min-height:55px;font-size:10px}.connection #signalIn{min-height:55px}
+.settings-button{background:none;color:#b9bcad;font-size:21px;min-width:44px;min-height:44px;margin-left:auto;padding:8px}.version{padding-left:10px}.engine-switch{display:flex;justify-content:space-between;align-items:center;text-align:left;margin:4px 0 12px;border:1px solid #ffffff1d}.engine-switch span{color:#a5a99b;font-size:12px}.engine-switch[aria-pressed=true]{border-color:#839d65;color:#dce9ca}.engine-switch[aria-pressed=true] span{color:#c6dcaa}.engine-panel{align-self:start;min-width:0;border-top:1px solid #ffffff20;margin-top:18px;padding:18px 0 0;color:#d4d5cd}.engine-heading{display:flex;justify-content:space-between;align-items:center}.engine-heading strong{font-size:17px;font-weight:600}.engine-heading small{display:block;font:10px ui-monospace,monospace;letter-spacing:1px;color:#8f9585;margin-top:6px}.engine-heading button{background:none;color:#92998a;font-size:25px;width:44px;height:44px;margin-right:-10px}.engine-state{display:flex;align-items:center;gap:7px;font-size:12px;margin:20px 0 10px}.engine-state i{width:7px;height:7px;border-radius:50%;background:#686d61}.engine-state i.running{background:#a7cc7b;box-shadow:0 0 0 4px #a7cc7b12}.engine-state i.error{background:#df8876}#enginePurpose{margin-left:auto;color:#8e9684;font-size:11px}.engine-context{font-size:11px;color:#9fa492;min-height:30px;line-height:1.6}.engine-position{display:flex;gap:13px;align-items:center;margin:16px 0 22px}.eval-rail{width:9px;height:80px;background:#141612;position:relative;overflow:hidden;border:1px solid #6f74654d}.eval-rail>div{position:absolute;bottom:0;width:100%;height:50%;background:#e4e8d6;transition:height .2s}.engine-eval small{display:block;font-size:10px;color:#959e88}.engine-eval strong{display:block;font:32px ui-monospace,monospace;margin:3px 0}.engine-eval>span{font-size:12px;color:#c8d8b4}.engine-metrics{display:grid;grid-template-columns:1fr 1fr;gap:17px 10px;margin:0 0 20px}.engine-metrics div{min-width:0}.engine-metrics dt{font-size:10px;color:#919b85;margin-bottom:6px}.engine-metrics dd{font:14px ui-monospace,monospace;margin:0;color:#d7dccf;overflow-wrap:anywhere}.engine-section{border-top:1px solid #ffffff10;padding-top:14px;margin-top:14px}.engine-label{font-size:11px;color:#aab39d;display:flex;justify-content:space-between;gap:8px}.engine-label span{font-size:10px;color:#7e8b71}.engine-pv{font:13px/1.8 ui-monospace,monospace;color:#dce5d0;min-height:58px;margin-top:9px;overflow-wrap:anywhere}.engine-chart{width:100%;height:74px;margin-top:8px;display:block}.engine-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.engine-actions button{font-size:11px;padding:10px 5px}.engine-log-wrap{margin-top:17px;border-top:1px solid #ffffff12;padding-top:13px}.engine-log-wrap summary{cursor:pointer;font-size:11px;color:#aab39d;min-height:30px}.engine-log-wrap summary span{font:10px ui-monospace,monospace;color:#89947a;margin-left:7px}.engine-log-wrap pre{font:10px/1.6 ui-monospace,monospace;background:#1c1e19;padding:9px;color:#a2b292;max-height:210px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;margin:6px 0}.engine-footnote{font-size:10px;color:#77826a;line-height:1.7;margin-top:16px}@media(min-width:900px){main.engine-open .engine-panel{grid-column:1/-1;margin-top:0;padding-top:20px}}@media(min-width:1280px){body:has(main.engine-open) header{max-width:1480px}main.engine-open{max-width:1480px;grid-template-columns:minmax(340px,620px) 280px minmax(280px,1fr);gap:24px}main.engine-open .engine-panel{grid-column:auto;position:sticky;top:24px;margin-top:46px;padding:0 0 0 20px;border-top:0;border-left:1px solid #ffffff17;max-height:calc(100dvh - 48px);overflow-y:auto;scrollbar-width:thin}}@media(max-width:899px){.engine-panel{margin-top:14px;padding-bottom:18px}.engine-metrics{grid-template-columns:repeat(3,1fr)}.engine-panel .engine-context{min-height:0}.engine-panel .engine-position{margin-bottom:17px}}@media(max-width:360px){.engine-metrics{grid-template-columns:1fr 1fr}}
+@media(max-width:1279px){main.engine-open .engine-panel{grid-column:1/-1}}.grade{--grade:#91ad55;display:inline-grid;place-items:center;border-radius:50%;background:var(--grade);color:#fff;width:19px;height:19px;font:800 12px/1 system-ui,sans-serif;flex-shrink:0;letter-spacing:-1px;vertical-align:middle;text-shadow:none;box-shadow:0 1px 2px #0003}.grade svg{width:13px;height:13px;display:block;fill:currentColor}.grade-board{position:absolute;right:1px;top:1px;z-index:6;width:clamp(18px,3vw,27px);height:clamp(18px,3vw,27px);font-size:clamp(11px,1.4vw,16px);pointer-events:none;box-shadow:0 0 0 1.5px #242421}.grade-board svg{width:65%;height:65%}.grade-brilliant{--grade:#20b7b0}.grade-great{--grade:#5b9ac2}.grade-best,.grade-excellent{--grade:#91b535}.grade-good{--grade:#8dad86}.grade-book{--grade:#b89a72}.grade-inaccuracy{--grade:#edb62e}.grade-mistake{--grade:#ec961b}.grade-miss{--grade:#e98756}.grade-blunder{--grade:#e65352}.grade-pending,.grade-unavailable{--grade:#636b5a;letter-spacing:0}.grade-pending:after{content:'';border:2px solid #ffffff40;border-top-color:#fff;border-radius:50%;width:9px;height:9px;animation:grade-spin .8s linear infinite}.grade-unavailable:after{content:'·';font-size:16px}.move-row>span:not(:first-child){display:flex;align-items:center;gap:7px;min-width:0}.move-row .grade{width:17px;height:17px;font-size:10px}.move-row .grade svg{width:11px;height:11px}@keyframes grade-spin{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.grade-pending:after{animation:none}}
+.auto-hint{display:inline-grid;place-items:center;background:none;color:#b5bdab;border:1px solid #ffffff20;border-radius:4px;min-width:40px;min-height:40px;font-size:23px;padding:3px 8px;margin-left:0!important}.auto-hint[aria-pressed=true]{color:#d9efbd;background:#3b4b30;border-color:#7e9d5d}.board-tools #hintButton{margin-right:0}.board-tools #flip{margin-left:auto}.camera-help{margin-top:12px;padding:10px;border:1px solid #81926b40;background:#2a3024;border-radius:4px}.camera-help p{color:#c1cbb5;font-size:12px}.camera-help .secondary{font-size:11px;line-height:1.4}.connection>.pair:has(#scanQr){display:flex}.connection>.pair:has(#scanQr)>button,.connection>.pair:has(#scanQr)>label{flex:1}</style></head><body>
+<header><div class="brand" id="logo"><span>♟</span>Шахматы</div><button id="openSettings" class="settings-button" aria-label="Открыть настройки" title="Настройки">⚙</button><button class="version" id="version" aria-label="Версия игры 3.9.0">v3.9.0</button></header>
+<main><section aria-label="Шахматная доска"><div class="player"><div class="avatar" id="topAvatar">♟</div><div><strong id="topName">Бот · Чёрные</strong><small id="topSub">Готов к партии</small></div><div class="turn-chip" id="topTurn"></div></div><div class="board-frame"><div class="board" id="board" role="group" aria-label="Шахматная доска"></div><div class="promotion" id="promotion" hidden><div class="promotion-box"><strong>Превращение пешки</strong><p>Выберите новую фигуру</p><div class="choices" id="choices"></div></div></div></div><div class="player"><div class="avatar" id="bottomAvatar">♙</div><div><strong id="bottomName">Вы · Белые</strong><small id="bottomSub">Хорошей игры!</small></div><div class="turn-chip" id="bottomTurn"></div></div><div class="board-tools"><button id="hintButton" class="secondary secret" hidden>Лучший ход</button><button id="autoHintButton" class="auto-hint" aria-label="Автоанализ" title="Автоанализ: выключен" aria-pressed="false" hidden>↻</button><span>Коснитесь фигуры, затем клетки</span><button class="icon-btn" id="flip" title="Перевернуть доску" aria-label="Перевернуть доску">⇅</button><button class="icon-btn" id="undo" title="Отменить ход" aria-label="Отменить ход" style="margin-left:0">↶</button></div><div id="analysis" class="analysis" role="status" aria-live="polite" hidden></div></section>
+<aside class="sidebar"><nav class="tabs" aria-label="Режимы"><button class="tab active" data-tab="bot">С ботом</button><button class="tab" data-tab="friend">С другом</button><button class="tab" data-tab="history">Ходы</button><button class="tab" data-tab="settings">Настройки</button></nav><div class="content"><section class="pane" id="pane-bot"><h1>Новая партия</h1><div class="form-grid"><div><label for="level">Уровень бота</label><select id="level"><option value="1">Начальный</option><option value="2" selected>Средний</option><option value="3">Сильный</option><option value="4">Эксперт</option></select></div><div><label for="color">Ваши фигуры</label><select id="color"><option value="w">Белые</option><option value="b">Чёрные</option></select></div></div><button class="primary" id="newBot">Начать партию</button></section>
+<section class="pane" id="pane-friend" hidden><section class="connection"><h1>Онлайн-дуэль</h1><button class="primary" id="findDuel">Искать дуэль</button><button class="secondary" id="cancelDuel" hidden>Отменить поиск</button><p id="duelStatus" class="note" role="status" aria-live="polite">Нажмите поиск — соперник подключится автоматически.</p><p class="note">Trystero · прямое P2P-соединение. Для поиска нужен интернет. В некоторых сетях прямое подключение недоступно.</p></section><h1>На одном телефоне</h1><label class="setting">Переворачивать доску<input type="checkbox" id="autoFlip"></label><button class="primary" id="newFriend">Начать вдвоём</button>
+<section class="connection" id="connection"><h2>На двух устройствах · WebRTC</h2><p>Одна Wi-Fi сеть, два телефона. Создайте приглашение и покажите QR другу. Затем отсканируйте его QR-ответ.</p><div class="pair"><button class="secondary" id="createOffer">Пригласить</button><button class="secondary" id="acceptOffer">Ввести приглашение</button></div><p id="netStatus" class="net-status" role="status" aria-live="polite">Нет подключения</p><div id="signalPanel" hidden><canvas id="qrCode" hidden aria-label="QR-код подключения"></canvas><div id="qrCaption" class="qr-caption"></div><div class="pair"><button class="secondary" id="scanQr">Сканировать QR</button><input id="qrCamera" type="file" accept="image/*" capture="environment" hidden><label class="secondary photo-button" for="qrImage">QR с фото<input id="qrImage" type="file" accept="image/*" hidden></label></div><div id="cameraHelp" class="camera-help" hidden><p id="cameraProblem" role="status"></p><div class="pair"><button class="secondary" id="takeQrPhoto">Снять QR камерой</button><button class="secondary" id="liveQrScan">Сканер в браузере</button></div></div><section id="qrScanner" hidden><video id="qrVideo" autoplay muted playsinline></video><p id="scanStatus" role="status">Наведите камеру на QR-код</p><button class="secondary" id="stopScan">Закрыть камеру</button></section><label for="signalOut" id="signalOutLabel">Ваш код</label><textarea id="signalOut" readonly spellcheck="false" aria-label="Код для отправки"></textarea><div class="pair"><button class="secondary" id="copySignal">Копировать</button><button class="secondary" id="saveSignal">Скачать код</button></div><label for="signalIn" id="signalInLabel">Код друга</label><textarea id="signalIn" spellcheck="false" placeholder="Вставьте код целиком"></textarea><label class="secondary" style="display:block;text-align:center;cursor:pointer" for="loadSignal">Загрузить код из файла<input id="loadSignal" type="file" accept=".txt,text/plain" hidden></label><button class="primary" id="applySignal">Подключиться</button></div><button class="secondary" id="disconnect" hidden>Отключиться</button><details><summary>Как подключиться</summary><p>1. Первый телефон: «Пригласить». На экране появится QR.</p><p>2. Второй телефон: «Ввести приглашение» → «Сканировать QR». Отсканируйте приглашение. Появится QR-ответ.</p><p>3. Первый телефон: «Сканировать QR». Прочитайте QR-ответ. Партия начнётся автоматически.</p><p>При открытии файла на телефоне «Сканировать QR» вызывает системную камеру. Снимите QR целиком — игра распознает его сама. Для непрерывного сканирования нажмите «Сканер в браузере». Через «QR с фото» можно выбрать готовое изображение. Можно также скопировать сжатый код или передать его файлом.</p><p>Без STUN/TURN-серверов. Гостевые сети с изоляцией устройств и некоторые браузеры могут блокировать соединение. При обрыве партия приостанавливается; для нового соединения создайте приглашение заново.</p></details></section></section>
+<section class="pane" id="pane-history" hidden><div class="eyebrow">ТЕКУЩАЯ ПАРТИЯ</div><h1>История ходов</h1><div id="moves" class="moves"></div><button class="secondary" id="copyPgn">Скачать PGN</button></section>
+<section class="pane" id="pane-settings" hidden><div class="eyebrow">ПОД ВАШ СТИЛЬ</div><h1>Настройки</h1><button id="toggleEngineView" class="secondary engine-switch" aria-pressed="false">Stockfish вид <span>Выкл.</span></button><label class="setting">Оценка ходов<input type="checkbox" id="moveReview" checked></label><label class="setting">Звуки ходов<input type="checkbox" id="sound" checked></label><label class="setting">Подсказки возможных ходов<input type="checkbox" id="legalDots" checked></label><label class="setting">Анимация фигур<input type="checkbox" id="animation" checked></label><label for="theme">Цвет доски</label><select id="theme"><option value="green">Классический зелёный</option><option value="wood">Тёплое дерево</option></select><label for="engineMemory">Режим движка</label><select id="engineMemory"><option value="auto">Авто — экономия памяти на телефоне</option><option value="mobile">Телефон — полный Stockfish 19, Hash 1 МБ</option><option value="full">Компьютер — полный Stockfish 19, Hash 16 МБ</option><option value="full32">Компьютер — полный Stockfish 19, Hash 32 МБ</option><option value="lite">Stockfish 19 Lite — минимум памяти</option></select><p class="note" id="engineRuntimeNote" role="status">Полный Stockfish 19. Если WASM аварийно завершится, включится явно обозначенный резерв Lite.</p><label for="hintSpeed">Анализ подсказок</label><select id="hintSpeed"><option value="fast">Быстрый — до 800 мс / глубины 12</option><option value="deep">Глубокий — до 6,5 секунд</option></select><button id="downloadEngine" class="secondary">Скачать SF19 в кэш браузера</button><progress id="engineDownloadProgress" max="100" value="0" hidden style="width:100%" aria-label="Загрузка Stockfish"></progress><p class="note" id="engineCacheStatus" role="status">Кэш Stockfish проверяется при первом анализе.</p><details class="licenses"><summary>Движок и лицензии</summary><p>Полный Stockfish 19, single-thread WASM, NNUE. GPLv3. Авторы Stockfish; сборка Stockfish.js — Nathan Rugg / Chess.com. <a href="https://github.com/nmrugg/stockfish.js/tree/v19.0.1">Исходный код сборки</a>. <a href="https://github.com/official-stockfish/Stockfish/tree/sf_19">Исходный код Stockfish 19</a>. Фигуры cburnett — Colin M. L. Burnett, GPLv2+. Цвета изменены. QR: qrcode-generator — Kazuhiko Arase (MIT); jsQR — Cosmo Wolfe (Apache-2.0).</p><pre>                    GNU GENERAL PUBLIC LICENSE
+                       Version 3, 29 June 2007
+
+ Copyright (C) 2007 Free Software Foundation, Inc. &lt;http://fsf.org/>
+ Everyone is permitted to copy and distribute verbatim copies
+ of this license document, but changing it is not allowed.
+
+                            Preamble
+
+  The GNU General Public License is a free, copyleft license for
+software and other kinds of works.
+
+  The licenses for most software and other practical works are designed
+to take away your freedom to share and change the works.  By contrast,
+the GNU General Public License is intended to guarantee your freedom to
+share and change all versions of a program--to make sure it remains free
+software for all its users.  We, the Free Software Foundation, use the
+GNU General Public License for most of our software; it applies also to
+any other work released this way by its authors.  You can apply it to
+your programs, too.
+
+  When we speak of free software, we are referring to freedom, not
+price.  Our General Public Licenses are designed to make sure that you
+have the freedom to distribute copies of free software (and charge for
+them if you wish), that you receive source code or can get it if you
+want it, that you can change the software or use pieces of it in new
+free programs, and that you know you can do these things.
+
+  To protect your rights, we need to prevent others from denying you
+these rights or asking you to surrender the rights.  Therefore, you have
+certain responsibilities if you distribute copies of the software, or if
+you modify it: responsibilities to respect the freedom of others.
+
+  For example, if you distribute copies of such a program, whether
+gratis or for a fee, you must pass on to the recipients the same
+freedoms that you received.  You must make sure that they, too, receive
+or can get the source code.  And you must show them these terms so they
+know their rights.
+
+  Developers that use the GNU GPL protect your rights with two steps:
+(1) assert copyright on the software, and (2) offer you this License
+giving you legal permission to copy, distribute and/or modify it.
+
+  For the developers' and authors' protection, the GPL clearly explains
+that there is no warranty for this free software.  For both users' and
+authors' sake, the GPL requires that modified versions be marked as
+changed, so that their problems will not be attributed erroneously to
+authors of previous versions.
+
+  Some devices are designed to deny users access to install or run
+modified versions of the software inside them, although the manufacturer
+can do so.  This is fundamentally incompatible with the aim of
+protecting users' freedom to change the software.  The systematic
+pattern of such abuse occurs in the area of products for individuals to
+use, which is precisely where it is most unacceptable.  Therefore, we
+have designed this version of the GPL to prohibit the practice for those
+products.  If such problems arise substantially in other domains, we
+stand ready to extend this provision to those domains in future versions
+of the GPL, as needed to protect the freedom of users.
+
+  Finally, every program is threatened constantly by software patents.
+States should not allow patents to restrict development and use of
+software on general-purpose computers, but in those that do, we wish to
+avoid the special danger that patents applied to a free program could
+make it effectively proprietary.  To prevent this, the GPL assures that
+patents cannot be used to render the program non-free.
+
+  The precise terms and conditions for copying, distribution and
+modification follow.
+
+                       TERMS AND CONDITIONS
+
+  0. Definitions.
+
+  "This License" refers to version 3 of the GNU General Public License.
+
+  "Copyright" also means copyright-like laws that apply to other kinds of
+works, such as semiconductor masks.
+
+  "The Program" refers to any copyrightable work licensed under this
+License.  Each licensee is addressed as "you".  "Licensees" and
+"recipients" may be individuals or organizations.
+
+  To "modify" a work means to copy from or adapt all or part of the work
+in a fashion requiring copyright permission, other than the making of an
+exact copy.  The resulting work is called a "modified version" of the
+earlier work or a work "based on" the earlier work.
+
+  A "covered work" means either the unmodified Program or a work based
+on the Program.
+
+  To "propagate" a work means to do anything with it that, without
+permission, would make you directly or secondarily liable for
+infringement under applicable copyright law, except executing it on a
+computer or modifying a private copy.  Propagation includes copying,
+distribution (with or without modification), making available to the
+public, and in some countries other activities as well.
+
+  To "convey" a work means any kind of propagation that enables other
+parties to make or receive copies.  Mere interaction with a user through
+a computer network, with no transfer of a copy, is not conveying.
+
+  An interactive user interface displays "Appropriate Legal Notices"
+to the extent that it includes a convenient and prominently visible
+feature that (1) displays an appropriate copyright notice, and (2)
+tells the user that there is no warranty for the work (except to the
+extent that warranties are provided), that licensees may convey the
+work under this License, and how to view a copy of this License.  If
+the interface presents a list of user commands or options, such as a
+menu, a prominent item in the list meets this criterion.
+
+  1. Source Code.
+
+  The "source code" for a work means the preferred form of the work
+for making modifications to it.  "Object code" means any non-source
+form of a work.
+
+  A "Standard Interface" means an interface that either is an official
+standard defined by a recognized standards body, or, in the case of
+interfaces specified for a particular programming language, one that
+is widely used among developers working in that language.
+
+  The "System Libraries" of an executable work include anything, other
+than the work as a whole, that (a) is included in the normal form of
+packaging a Major Component, but which is not part of that Major
+Component, and (b) serves only to enable use of the work with that
+Major Component, or to implement a Standard Interface for which an
+implementation is available to the public in source code form.  A
+"Major Component", in this context, means a major essential component
+(kernel, window system, and so on) of the specific operating system
+(if any) on which the executable work runs, or a compiler used to
+produce the work, or an object code interpreter used to run it.
+
+  The "Corresponding Source" for a work in object code form means all
+the source code needed to generate, install, and (for an executable
+work) run the object code and to modify the work, including scripts to
+control those activities.  However, it does not include the work's
+System Libraries, or general-purpose tools or generally available free
+programs which are used unmodified in performing those activities but
+which are not part of the work.  For example, Corresponding Source
+includes interface definition files associated with source files for
+the work, and the source code for shared libraries and dynamically
+linked subprograms that the work is specifically designed to require,
+such as by intimate data communication or control flow between those
+subprograms and other parts of the work.
+
+  The Corresponding Source need not include anything that users
+can regenerate automatically from other parts of the Corresponding
+Source.
+
+  The Corresponding Source for a work in source code form is that
+same work.
+
+  2. Basic Permissions.
+
+  All rights granted under this License are granted for the term of
+copyright on the Program, and are irrevocable provided the stated
+conditions are met.  This License explicitly affirms your unlimited
+permission to run the unmodified Program.  The output from running a
+covered work is covered by this License only if the output, given its
+content, constitutes a covered work.  This License acknowledges your
+rights of fair use or other equivalent, as provided by copyright law.
+
+  You may make, run and propagate covered works that you do not
+convey, without conditions so long as your license otherwise remains
+in force.  You may convey covered works to others for the sole purpose
+of having them make modifications exclusively for you, or provide you
+with facilities for running those works, provided that you comply with
+the terms of this License in conveying all material for which you do
+not control copyright.  Those thus making or running the covered works
+for you must do so exclusively on your behalf, under your direction
+and control, on terms that prohibit them from making any copies of
+your copyrighted material outside their relationship with you.
+
+  Conveying under any other circumstances is permitted solely under
+the conditions stated below.  Sublicensing is not allowed; section 10
+makes it unnecessary.
+
+  3. Protecting Users' Legal Rights From Anti-Circumvention Law.
+
+  No covered work shall be deemed part of an effective technological
+measure under any applicable law fulfilling obligations under article
+11 of the WIPO copyright treaty adopted on 20 December 1996, or
+similar laws prohibiting or restricting circumvention of such
+measures.
+
+  When you convey a covered work, you waive any legal power to forbid
+circumvention of technological measures to the extent such circumvention
+is effected by exercising rights under this License with respect to
+the covered work, and you disclaim any intention to limit operation or
+modification of the work as a means of enforcing, against the work's
+users, your or third parties' legal rights to forbid circumvention of
+technological measures.
+
+  4. Conveying Verbatim Copies.
+
+  You may convey verbatim copies of the Program's source code as you
+receive it, in any medium, provided that you conspicuously and
+appropriately publish on each copy an appropriate copyright notice;
+keep intact all notices stating that this License and any
+non-permissive terms added in accord with section 7 apply to the code;
+keep intact all notices of the absence of any warranty; and give all
+recipients a copy of this License along with the Program.
+
+  You may charge any price or no price for each copy that you convey,
+and you may offer support or warranty protection for a fee.
+
+  5. Conveying Modified Source Versions.
+
+  You may convey a work based on the Program, or the modifications to
+produce it from the Program, in the form of source code under the
+terms of section 4, provided that you also meet all of these conditions:
+
+    a) The work must carry prominent notices stating that you modified
+    it, and giving a relevant date.
+
+    b) The work must carry prominent notices stating that it is
+    released under this License and any conditions added under section
+    7.  This requirement modifies the requirement in section 4 to
+    "keep intact all notices".
+
+    c) You must license the entire work, as a whole, under this
+    License to anyone who comes into possession of a copy.  This
+    License will therefore apply, along with any applicable section 7
+    additional terms, to the whole of the work, and all its parts,
+    regardless of how they are packaged.  This License gives no
+    permission to license the work in any other way, but it does not
+    invalidate such permission if you have separately received it.
+
+    d) If the work has interactive user interfaces, each must display
+    Appropriate Legal Notices; however, if the Program has interactive
+    interfaces that do not display Appropriate Legal Notices, your
+    work need not make them do so.
+
+  A compilation of a covered work with other separate and independent
+works, which are not by their nature extensions of the covered work,
+and which are not combined with it such as to form a larger program,
+in or on a volume of a storage or distribution medium, is called an
+"aggregate" if the compilation and its resulting copyright are not
+used to limit the access or legal rights of the compilation's users
+beyond what the individual works permit.  Inclusion of a covered work
+in an aggregate does not cause this License to apply to the other
+parts of the aggregate.
+
+  6. Conveying Non-Source Forms.
+
+  You may convey a covered work in object code form under the terms
+of sections 4 and 5, provided that you also convey the
+machine-readable Corresponding Source under the terms of this License,
+in one of these ways:
+
+    a) Convey the object code in, or embodied in, a physical product
+    (including a physical distribution medium), accompanied by the
+    Corresponding Source fixed on a durable physical medium
+    customarily used for software interchange.
+
+    b) Convey the object code in, or embodied in, a physical product
+    (including a physical distribution medium), accompanied by a
+    written offer, valid for at least three years and valid for as
+    long as you offer spare parts or customer support for that product
+    model, to give anyone who possesses the object code either (1) a
+    copy of the Corresponding Source for all the software in the
+    product that is covered by this License, on a durable physical
+    medium customarily used for software interchange, for a price no
+    more than your reasonable cost of physically performing this
+    conveying of source, or (2) access to copy the
+    Corresponding Source from a network server at no charge.
+
+    c) Convey individual copies of the object code with a copy of the
+    written offer to provide the Corresponding Source.  This
+    alternative is allowed only occasionally and noncommercially, and
+    only if you received the object code with such an offer, in accord
+    with subsection 6b.
+
+    d) Convey the object code by offering access from a designated
+    place (gratis or for a charge), and offer equivalent access to the
+    Corresponding Source in the same way through the same place at no
+    further charge.  You need not require recipients to copy the
+    Corresponding Source along with the object code.  If the place to
+    copy the object code is a network server, the Corresponding Source
+    may be on a different server (operated by you or a third party)
+    that supports equivalent copying facilities, provided you maintain
+    clear directions next to the object code saying where to find the
+    Corresponding Source.  Regardless of what server hosts the
+    Corresponding Source, you remain obligated to ensure that it is
+    available for as long as needed to satisfy these requirements.
+
+    e) Convey the object code using peer-to-peer transmission, provided
+    you inform other peers where the object code and Corresponding
+    Source of the work are being offered to the general public at no
+    charge under subsection 6d.
+
+  A separable portion of the object code, whose source code is excluded
+from the Corresponding Source as a System Library, need not be
+included in conveying the object code work.
+
+  A "User Product" is either (1) a "consumer product", which means any
+tangible personal property which is normally used for personal, family,
+or household purposes, or (2) anything designed or sold for incorporation
+into a dwelling.  In determining whether a product is a consumer product,
+doubtful cases shall be resolved in favor of coverage.  For a particular
+product received by a particular user, "normally used" refers to a
+typical or common use of that class of product, regardless of the status
+of the particular user or of the way in which the particular user
+actually uses, or expects or is expected to use, the product.  A product
+is a consumer product regardless of whether the product has substantial
+commercial, industrial or non-consumer uses, unless such uses represent
+the only significant mode of use of the product.
+
+  "Installation Information" for a User Product means any methods,
+procedures, authorization keys, or other information required to install
+and execute modified versions of a covered work in that User Product from
+a modified version of its Corresponding Source.  The information must
+suffice to ensure that the continued functioning of the modified object
+code is in no case prevented or interfered with solely because
+modification has been made.
+
+  If you convey an object code work under this section in, or with, or
+specifically for use in, a User Product, and the conveying occurs as
+part of a transaction in which the right of possession and use of the
+User Product is transferred to the recipient in perpetuity or for a
+fixed term (regardless of how the transaction is characterized), the
+Corresponding Source conveyed under this section must be accompanied
+by the Installation Information.  But this requirement does not apply
+if neither you nor any third party retains the ability to install
+modified object code on the User Product (for example, the work has
+been installed in ROM).
+
+  The requirement to provide Installation Information does not include a
+requirement to continue to provide support service, warranty, or updates
+for a work that has been modified or installed by the recipient, or for
+the User Product in which it has been modified or installed.  Access to a
+network may be denied when the modification itself materially and
+adversely affects the operation of the network or violates the rules and
+protocols for communication across the network.
+
+  Corresponding Source conveyed, and Installation Information provided,
+in accord with this section must be in a format that is publicly
+documented (and with an implementation available to the public in
+source code form), and must require no special password or key for
+unpacking, reading or copying.
+
+  7. Additional Terms.
+
+  "Additional permissions" are terms that supplement the terms of this
+License by making exceptions from one or more of its conditions.
+Additional permissions that are applicable to the entire Program shall
+be treated as though they were included in this License, to the extent
+that they are valid under applicable law.  If additional permissions
+apply only to part of the Program, that part may be used separately
+under those permissions, but the entire Program remains governed by
+this License without regard to the additional permissions.
+
+  When you convey a copy of a covered work, you may at your option
+remove any additional permissions from that copy, or from any part of
+it.  (Additional permissions may be written to require their own
+removal in certain cases when you modify the work.)  You may place
+additional permissions on material, added by you to a covered work,
+for which you have or can give appropriate copyright permission.
+
+  Notwithstanding any other provision of this License, for material you
+add to a covered work, you may (if authorized by the copyright holders of
+that material) supplement the terms of this License with terms:
+
+    a) Disclaiming warranty or limiting liability differently from the
+    terms of sections 15 and 16 of this License; or
+
+    b) Requiring preservation of specified reasonable legal notices or
+    author attributions in that material or in the Appropriate Legal
+    Notices displayed by works containing it; or
+
+    c) Prohibiting misrepresentation of the origin of that material, or
+    requiring that modified versions of such material be marked in
+    reasonable ways as different from the original version; or
+
+    d) Limiting the use for publicity purposes of names of licensors or
+    authors of the material; or
+
+    e) Declining to grant rights under trademark law for use of some
+    trade names, trademarks, or service marks; or
+
+    f) Requiring indemnification of licensors and authors of that
+    material by anyone who conveys the material (or modified versions of
+    it) with contractual assumptions of liability to the recipient, for
+    any liability that these contractual assumptions directly impose on
+    those licensors and authors.
+
+  All other non-permissive additional terms are considered "further
+restrictions" within the meaning of section 10.  If the Program as you
+received it, or any part of it, contains a notice stating that it is
+governed by this License along with a term that is a further
+restriction, you may remove that term.  If a license document contains
+a further restriction but permits relicensing or conveying under this
+License, you may add to a covered work material governed by the terms
+of that license document, provided that the further restriction does
+not survive such relicensing or conveying.
+
+  If you add terms to a covered work in accord with this section, you
+must place, in the relevant source files, a statement of the
+additional terms that apply to those files, or a notice indicating
+where to find the applicable terms.
+
+  Additional terms, permissive or non-permissive, may be stated in the
+form of a separately written license, or stated as exceptions;
+the above requirements apply either way.
+
+  8. Termination.
+
+  You may not propagate or modify a covered work except as expressly
+provided under this License.  Any attempt otherwise to propagate or
+modify it is void, and will automatically terminate your rights under
+this License (including any patent licenses granted under the third
+paragraph of section 11).
+
+  However, if you cease all violation of this License, then your
+license from a particular copyright holder is reinstated (a)
+provisionally, unless and until the copyright holder explicitly and
+finally terminates your license, and (b) permanently, if the copyright
+holder fails to notify you of the violation by some reasonable means
+prior to 60 days after the cessation.
+
+  Moreover, your license from a particular copyright holder is
+reinstated permanently if the copyright holder notifies you of the
+violation by some reasonable means, this is the first time you have
+received notice of violation of this License (for any work) from that
+copyright holder, and you cure the violation prior to 30 days after
+your receipt of the notice.
+
+  Termination of your rights under this section does not terminate the
+licenses of parties who have received copies or rights from you under
+this License.  If your rights have been terminated and not permanently
+reinstated, you do not qualify to receive new licenses for the same
+material under section 10.
+
+  9. Acceptance Not Required for Having Copies.
+
+  You are not required to accept this License in order to receive or
+run a copy of the Program.  Ancillary propagation of a covered work
+occurring solely as a consequence of using peer-to-peer transmission
+to receive a copy likewise does not require acceptance.  However,
+nothing other than this License grants you permission to propagate or
+modify any covered work.  These actions infringe copyright if you do
+not accept this License.  Therefore, by modifying or propagating a
+covered work, you indicate your acceptance of this License to do so.
+
+  10. Automatic Licensing of Downstream Recipients.
+
+  Each time you convey a covered work, the recipient automatically
+receives a license from the original licensors, to run, modify and
+propagate that work, subject to this License.  You are not responsible
+for enforcing compliance by third parties with this License.
+
+  An "entity transaction" is a transaction transferring control of an
+organization, or substantially all assets of one, or subdividing an
+organization, or merging organizations.  If propagation of a covered
+work results from an entity transaction, each party to that
+transaction who receives a copy of the work also receives whatever
+licenses to the work the party's predecessor in interest had or could
+give under the previous paragraph, plus a right to possession of the
+Corresponding Source of the work from the predecessor in interest, if
+the predecessor has it or can get it with reasonable efforts.
+
+  You may not impose any further restrictions on the exercise of the
+rights granted or affirmed under this License.  For example, you may
+not impose a license fee, royalty, or other charge for exercise of
+rights granted under this License, and you may not initiate litigation
+(including a cross-claim or counterclaim in a lawsuit) alleging that
+any patent claim is infringed by making, using, selling, offering for
+sale, or importing the Program or any portion of it.
+
+  11. Patents.
+
+  A "contributor" is a copyright holder who authorizes use under this
+License of the Program or a work on which the Program is based.  The
+work thus licensed is called the contributor's "contributor version".
+
+  A contributor's "essential patent claims" are all patent claims
+owned or controlled by the contributor, whether already acquired or
+hereafter acquired, that would be infringed by some manner, permitted
+by this License, of making, using, or selling its contributor version,
+but do not include claims that would be infringed only as a
+consequence of further modification of the contributor version.  For
+purposes of this definition, "control" includes the right to grant
+patent sublicenses in a manner consistent with the requirements of
+this License.
+
+  Each contributor grants you a non-exclusive, worldwide, royalty-free
+patent license under the contributor's essential patent claims, to
+make, use, sell, offer for sale, import and otherwise run, modify and
+propagate the contents of its contributor version.
+
+  In the following three paragraphs, a "patent license" is any express
+agreement or commitment, however denominated, not to enforce a patent
+(such as an express permission to practice a patent or covenant not to
+sue for patent infringement).  To "grant" such a patent license to a
+party means to make such an agreement or commitment not to enforce a
+patent against the party.
+
+  If you convey a covered work, knowingly relying on a patent license,
+and the Corresponding Source of the work is not available for anyone
+to copy, free of charge and under the terms of this License, through a
+publicly available network server or other readily accessible means,
+then you must either (1) cause the Corresponding Source to be so
+available, or (2) arrange to deprive yourself of the benefit of the
+patent license for this particular work, or (3) arrange, in a manner
+consistent with the requirements of this License, to extend the patent
+license to downstream recipients.  "Knowingly relying" means you have
+actual knowledge that, but for the patent license, your conveying the
+covered work in a country, or your recipient's use of the covered work
+in a country, would infringe one or more identifiable patents in that
+country that you have reason to believe are valid.
+
+  If, pursuant to or in connection with a single transaction or
+arrangement, you convey, or propagate by procuring conveyance of, a
+covered work, and grant a patent license to some of the parties
+receiving the covered work authorizing them to use, propagate, modify
+or convey a specific copy of the covered work, then the patent license
+you grant is automatically extended to all recipients of the covered
+work and works based on it.
+
+  A patent license is "discriminatory" if it does not include within
+the scope of its coverage, prohibits the exercise of, or is
+conditioned on the non-exercise of one or more of the rights that are
+specifically granted under this License.  You may not convey a covered
+work if you are a party to an arrangement with a third party that is
+in the business of distributing software, under which you make payment
+to the third party based on the extent of your activity of conveying
+the work, and under which the third party grants, to any of the
+parties who would receive the covered work from you, a discriminatory
+patent license (a) in connection with copies of the covered work
+conveyed by you (or copies made from those copies), or (b) primarily
+for and in connection with specific products or compilations that
+contain the covered work, unless you entered into that arrangement,
+or that patent license was granted, prior to 28 March 2007.
+
+  Nothing in this License shall be construed as excluding or limiting
+any implied license or other defenses to infringement that may
+otherwise be available to you under applicable patent law.
+
+  12. No Surrender of Others' Freedom.
+
+  If conditions are imposed on you (whether by court order, agreement or
+otherwise) that contradict the conditions of this License, they do not
+excuse you from the conditions of this License.  If you cannot convey a
+covered work so as to satisfy simultaneously your obligations under this
+License and any other pertinent obligations, then as a consequence you may
+not convey it at all.  For example, if you agree to terms that obligate you
+to collect a royalty for further conveying from those to whom you convey
+the Program, the only way you could satisfy both those terms and this
+License would be to refrain entirely from conveying the Program.
+
+  13. Use with the GNU Affero General Public License.
+
+  Notwithstanding any other provision of this License, you have
+permission to link or combine any covered work with a work licensed
+under version 3 of the GNU Affero General Public License into a single
+combined work, and to convey the resulting work.  The terms of this
+License will continue to apply to the part which is the covered work,
+but the special requirements of the GNU Affero General Public License,
+section 13, concerning interaction through a network will apply to the
+combination as such.
+
+  14. Revised Versions of this License.
+
+  The Free Software Foundation may publish revised and/or new versions of
+the GNU General Public License from time to time.  Such new versions will
+be similar in spirit to the present version, but may differ in detail to
+address new problems or concerns.
+
+  Each version is given a distinguishing version number.  If the
+Program specifies that a certain numbered version of the GNU General
+Public License "or any later version" applies to it, you have the
+option of following the terms and conditions either of that numbered
+version or of any later version published by the Free Software
+Foundation.  If the Program does not specify a version number of the
+GNU General Public License, you may choose any version ever published
+by the Free Software Foundation.
+
+  If the Program specifies that a proxy can decide which future
+versions of the GNU General Public License can be used, that proxy's
+public statement of acceptance of a version permanently authorizes you
+to choose that version for the Program.
+
+  Later license versions may give you additional or different
+permissions.  However, no additional obligations are imposed on any
+author or copyright holder as a result of your choosing to follow a
+later version.
+
+  15. Disclaimer of Warranty.
+
+  THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
+APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT
+HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY
+OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM
+IS WITH YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF
+ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+
+  16. Limitation of Liability.
+
+  IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MODIFIES AND/OR CONVEYS
+THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY
+GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE
+USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF
+DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD
+PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS),
+EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+  17. Interpretation of Sections 15 and 16.
+
+  If the disclaimer of warranty and limitation of liability provided
+above cannot be given local legal effect according to their terms,
+reviewing courts shall apply local law that most closely approximates
+an absolute waiver of all civil liability in connection with the
+Program, unless a warranty or assumption of liability accompanies a
+copy of the Program in return for a fee.
+
+                     END OF TERMS AND CONDITIONS
+
+            How to Apply These Terms to Your New Programs
+
+  If you develop a new program, and you want it to be of the greatest
+possible use to the public, the best way to achieve this is to make it
+free software which everyone can redistribute and change under these terms.
+
+  To do so, attach the following notices to the program.  It is safest
+to attach them to the start of each source file to most effectively
+state the exclusion of warranty; and each file should have at least
+the "copyright" line and a pointer to where the full notice is found.
+
+    &lt;one line to give the program's name and a brief idea of what it does.>
+    Copyright (C) &lt;year>  &lt;name of author>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see &lt;http://www.gnu.org/licenses/>.
+
+Also add information on how to contact you by electronic and paper mail.
+
+  If the program does terminal interaction, make it output a short
+notice like this when it starts in an interactive mode:
+
+    &lt;program>  Copyright (C) &lt;year>  &lt;name of author>
+    This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+    This is free software, and you are welcome to redistribute it
+    under certain conditions; type `show c' for details.
+
+The hypothetical commands `show w' and `show c' should show the appropriate
+parts of the General Public License.  Of course, your program's commands
+might be different; for a GUI interface, you would use an "about box".
+
+  You should also get your employer (if you work as a programmer) or school,
+if any, to sign a "copyright disclaimer" for the program, if necessary.
+For more information on this, and how to apply and follow the GNU GPL, see
+&lt;http://www.gnu.org/licenses/>.
+
+  The GNU General Public License does not permit incorporating your program
+into proprietary programs.  If your program is a subroutine library, you
+may consider it more useful to permit linking proprietary applications with
+the library.  If this is what you want to do, use the GNU Lesser General
+Public License instead of this License.  But first, please read
+&lt;http://www.gnu.org/philosophy/why-not-lgpl.html>.
+\nMIT License
+
+Copyright (c) 2009 Kazuhiko Arase
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+\n                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "{}"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright {yyyy} {name of copyright owner}
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+</pre></details><p class="note">Бот работает без сети. В WebRTC другу передаются только ходы. Партия хранится до закрытия страницы.</p></section>
+</div><div class="status" id="status" role="status" aria-live="polite"></div></aside><aside id="enginePanel" class="engine-panel" aria-label="Монитор Stockfish 19" hidden><div class="engine-heading"><div><strong id="activeEngineName">Stockfish 19</strong><small id="activeEngineBuild">SFNNv16 · 1 THREAD</small></div><button id="closeEngineView" aria-label="Закрыть панель Stockfish">×</button></div><div class="engine-state"><i id="engineLamp"></i><span id="engineState" role="status">Ожидание</span><span id="enginePurpose"></span></div><p class="engine-context" id="engineContext">Сделайте ход против бота или запустите анализ.</p><div class="engine-position"><div class="eval-rail"><div id="engineEvalFill"></div></div><div class="engine-eval"><small>Оценка за белых</small><strong id="engineScore">—</strong><span id="engineBest">Лучший ход: —</span></div></div><dl class="engine-metrics"><div><dt>Глубина / макс.</dt><dd id="engineDepth">—</dd></div><div><dt>Позиций</dt><dd id="engineNodes">—</dd></div><div><dt>Позиций / сек.</dt><dd id="engineNps">—</dd></div><div><dt>Время поиска</dt><dd id="engineTime">—</dd></div><div><dt>Текущий ход</dt><dd id="engineCurrent">—</dd></div><div><dt>Hash заполнен</dt><dd id="engineHash">—</dd></div></dl><div class="engine-section"><div class="engine-label">Основное продолжение <span id="engineBound"></span></div><div class="engine-pv" id="enginePv">Движок ещё не запускался.</div></div><div class="engine-section"><div class="engine-label">Оценка по глубине <span>за белых</span></div><svg id="engineChart" class="engine-chart" viewBox="0 0 300 74" role="img" aria-label="Изменение оценки в ходе поиска"><path d="M0 37H300" stroke="#ffffff18"/><path id="engineChartPath" fill="none" stroke="#b4c995" stroke-width="2"/></svg></div><div class="engine-actions"><button id="engineAnalyze" class="secondary">Анализ позиции</button><button id="engineClearLog" class="secondary">Очистить журнал</button></div><details class="engine-log-wrap"><summary>Журнал UCI <span id="engineLogCount">0</span></summary><pre id="engineLog" aria-label="Журнал команд и ответов движка"></pre></details><p class="engine-footnote">Данные поступают от Stockfish во время поиска. Продолжение — рассчитанная линия ходов, а не текстовые рассуждения. Оценка относится к указанной позиции.</p></aside></main><footer>CHESS OFFLINE · Независимая версия, вдохновлённая классическим шахматным интерфейсом</footer>
+<script>
+'use strict';
+// Board indices: a8=0, h1=63. Uppercase pieces are white.
+function createChess(){
+const color=p=>p?(p===p.toUpperCase()?'w':'b'):null,opp=c=>c==='w'?'b':'w',name=i=>'abcdefgh'[i%8]+(8-Math.floor(i/8));
+function initial(){return {b:'rnbqkbnrpppppppp................................PPPPPPPPRNBQKBNR'.split('').map(p=>p==='.'?null:p),turn:'w',castle:'KQkq',ep:-1,half:0,full:1}}
+function attacked(s,i,by){const r=i>>3,c=i%8,own=t=>by==='w'?t.toUpperCase():t;let pr=r+(by==='w'?1:-1);if(pr>=0&&pr<8)for(let dx of [-1,1])if(c+dx>=0&&c+dx<8&&s.b[pr*8+c+dx]===own('p'))return true;for(let [dy,dx] of [[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]]){let y=r+dy,x=c+dx;if(y>=0&&y<8&&x>=0&&x<8&&s.b[y*8+x]===own('n'))return true}for(let [dy,dx] of [[1,1],[1,-1],[-1,1],[-1,-1],[1,0],[-1,0],[0,1],[0,-1]]){let y=r+dy,x=c+dx,d=1;while(y>=0&&y<8&&x>=0&&x<8){let p=s.b[y*8+x];if(p){if(color(p)===by){let t=p.toLowerCase();if(t==='q'||t===(dy&&dx?'b':'r')||(d===1&&t==='k'))return true}break}y+=dy;x+=dx;d++}}return false}
+function check(s,c=s.turn){let k=s.b.indexOf(c==='w'?'K':'k');return k<0||attacked(s,k,opp(c))}
+function apply(s,m){let n={...s,b:s.b.slice()},p=n.b[m.f],capt=n.b[m.t],c=color(p);n.b[m.f]=null;n.b[m.t]=m.p?(c==='w'?m.p.toUpperCase():m.p):p;if(m.ep)n.b[m.t+(c==='w'?8:-8)]=null;if(m.castle){let rf=m.t>m.f?m.f+3:m.f-4,rt=m.t>m.f?m.f+1:m.f-1;n.b[rt]=n.b[rf];n.b[rf]=null}if(p==='K')n.castle=n.castle.replace(/[KQ]/g,'');if(p==='k')n.castle=n.castle.replace(/[kq]/g,'');for(const [i,right] of [[0,'q'],[7,'k'],[56,'Q'],[63,'K']])if(m.f===i||m.t===i)n.castle=n.castle.replace(right,'');n.ep=p.toLowerCase()==='p'&&Math.abs(m.t-m.f)===16?(m.f+m.t)/2:-1;n.half=p.toLowerCase()==='p'||capt||m.ep?0:s.half+1;n.full=s.full+(s.turn==='b'?1:0);n.turn=opp(s.turn);return n}
+function pseudo(s){let out=[],c=s.turn;function add(f,t,extra={}){if(s.b[t]?.toLowerCase()==='k')return;let p=s.b[f];if(p.toLowerCase()==='p'&&(t<8||t>=56))for(const q of ['q','r','b','n'])out.push({f,t,p:q,...extra});else out.push({f,t,...extra})}for(let f=0;f<64;f++){let p=s.b[f];if(color(p)!==c)continue;let r=f>>3,x=f%8,t=p.toLowerCase();if(t==='p'){let d=c==='w'?-1:1,rr=r+d;if(rr<0||rr>7)continue;let to=rr*8+x;if(!s.b[to]){add(f,to);if(r===(c==='w'?6:1)&&!s.b[(r+2*d)*8+x])add(f,(r+2*d)*8+x)}for(let dx of [-1,1])if(x+dx>=0&&x+dx<8){to=rr*8+x+dx;if(color(s.b[to])===opp(c))add(f,to);else if(to===s.ep&&s.b[r*8+x+dx]===(c==='w'?'p':'P'))add(f,to,{ep:true})}continue}let dirs=t==='n'?[[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]]:t==='b'?[[1,1],[1,-1],[-1,1],[-1,-1]]:t==='r'?[[1,0],[-1,0],[0,1],[0,-1]]:[[1,1],[1,-1],[-1,1],[-1,-1],[1,0],[-1,0],[0,1],[0,-1]];for(let [dy,dx] of dirs){let yy=r+dy,xx=x+dx;while(yy>=0&&yy<8&&xx>=0&&xx<8){let to=yy*8+xx;if(color(s.b[to])===c)break;add(f,to);if(s.b[to]||t==='n'||t==='k')break;yy+=dy;xx+=dx}}if(t==='k'&&f===(c==='w'?60:4)&&!check(s)){for(let side of [1,-1]){let right=c==='w'?(side===1?'K':'Q'):(side===1?'k':'q'),rook=f+(side===1?3:-4),empty=side===1?[f+1,f+2]:[f-1,f-2,f-3];if(s.castle.includes(right)&&s.b[rook]===(c==='w'?'R':'r')&&empty.every(i=>!s.b[i])&&[f+side,f+side*2].every(i=>!attacked(s,i,opp(c))))add(f,f+side*2,{castle:true})}}}return out}
+function legal(s){return pseudo(s).filter(m=>!check(apply(s,m),s.turn))}
+function key(s){let ep=s.ep>=0&&legal(s).some(m=>m.ep)?s.ep:-1;return s.b.map(p=>p||'.').join('')+s.turn+s.castle+ep}
+function insufficient(s){let ps=s.b.map((p,i)=>({p:p?.toLowerCase(),i})).filter(x=>x.p&&x.p!=='k');if(!ps.length)return true;if(ps.length===1&&['b','n'].includes(ps[0].p))return true;return ps.every(x=>x.p==='b')&&new Set(ps.map(x=>((x.i>>3)+x.i%8)%2)).size===1}
+function san(s,m,all=legal(s)){let p=s.b[m.f],t=p.toLowerCase(),capture=!!s.b[m.t]||m.ep,txt;if(m.castle)txt=m.t>m.f?'O-O':'O-O-O';else{txt=t==='p'?(capture?name(m.f)[0]:''):p.toUpperCase();if(t!=='p'){let rivals=all.filter(x=>x.f!==m.f&&x.t===m.t&&s.b[x.f]===p);if(rivals.length)txt+=rivals.every(x=>x.f%8!==m.f%8)?name(m.f)[0]:rivals.every(x=>(x.f>>3)!==(m.f>>3))?name(m.f)[1]:name(m.f)}txt+=(capture?'x':'')+name(m.t)+(m.p?'='+m.p.toUpperCase():'')}let n=apply(s,m);if(check(n))txt+=legal(n).length?'+':'#';return txt}
+return {initial,color,opp,name,apply,legal,check,key,insufficient,san};} const Chess=createChess();
+const $=id=>document.getElementById(id);let state=Chess.initial(),mode='bot',human='w',flipped=false,selected=-1,possible=[],last=null,hint=null,history=[],snapshots=[],keys=[Chess.key(state)],busy=false,animating=false,worker=null,generation=0,gameResult='*',uciMoves=[],searchAbort=null,boardFocus=52;
+const pieceArt={"P":"<svg class=\"piece\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" style=\"color-scheme:light only\"  viewBox=\"0 0 45 45\"><path fill=\"#faf9ee\" stroke=\"#575448\" stroke-linecap=\"round\" stroke-width=\"1.5\" d=\"M22.5 9c-2.21 0-4 1.79-4 4 0 .89.29 1.71.78 2.38C17.33 16.5 16 18.59 16 21c0 2.03.94 3.84 2.41 5.03-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47 1.47-1.19 2.41-3 2.41-5.03 0-2.41-1.33-4.5-3.28-5.62.49-.67.78-1.49.78-2.38 0-2.21-1.79-4-4-4z\"/></svg>","N":"<svg class=\"piece\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" style=\"color-scheme:light only\"  viewBox=\"0 0 45 45\"><g fill=\"none\" fill-rule=\"evenodd\" stroke=\"#575448\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\"><path fill=\"#faf9ee\" d=\"M22 10c10.5 1 16.5 8 16 29H15c0-9 10-6.5 8-21\"/><path fill=\"#faf9ee\" d=\"M24 18c.38 2.91-5.55 7.37-8 9-3 2-2.82 4.34-5 4-1.042-.94 1.41-3.04 0-3-1 0 .19 1.23-1 2-1 0-4.003 1-4-4 0-2 6-12 6-12s1.89-1.9 2-3.5c-.73-.994-.5-2-.5-3 1-1 3 2.5 3 2.5h2s.78-1.992 2.5-3c1 0 1 3 1 3\"/><path fill=\"#575448\" d=\"M9.5 25.5a.5.5 0 1 1-1 0 .5.5 0 1 1 1 0m5.433-9.75a.5 1.5 30 1 1-.866-.5.5 1.5 30 1 1 .866.5\"/></g></svg>","B":"<svg class=\"piece\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" style=\"color-scheme:light only\"  viewBox=\"0 0 45 45\"><g fill=\"none\" fill-rule=\"evenodd\" stroke=\"#575448\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\"><g fill=\"#faf9ee\" stroke-linecap=\"butt\"><path d=\"M9 36c3.39-.97 10.11.43 13.5-2 3.39 2.43 10.11 1.03 13.5 2 0 0 1.65.54 3 2-.68.97-1.65.99-3 .5-3.39-.97-10.11.46-13.5-1-3.39 1.46-10.11.03-13.5 1-1.35.49-2.32.47-3-.5 1.35-1.94 3-2 3-2z\"/><path d=\"M15 32c2.5 2.5 12.5 2.5 15 0 .5-1.5 0-2 0-2 0-2.5-2.5-4-2.5-4 5.5-1.5 6-11.5-5-15.5-11 4-10.5 14-5 15.5 0 0-2.5 1.5-2.5 4 0 0-.5.5 0 2z\"/><path d=\"M25 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 1 1 5 0z\"/></g><path stroke-linejoin=\"miter\" d=\"M17.5 26h10M15 30h15m-7.5-14.5v5M20 18h5\"/></g></svg>","R":"<svg class=\"piece\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" style=\"color-scheme:light only\"  viewBox=\"0 0 45 45\"><g fill=\"#faf9ee\" fill-rule=\"evenodd\" stroke=\"#575448\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\"><path stroke-linecap=\"butt\" d=\"M9 39h27v-3H9zm3-3v-4h21v4zm-1-22V9h4v2h5V9h5v2h5V9h4v5\"/><path d=\"m34 14-3 3H14l-3-3\"/><path stroke-linecap=\"butt\" stroke-linejoin=\"miter\" d=\"M31 17v12.5H14V17\"/><path d=\"m31 29.5 1.5 2.5h-20l1.5-2.5\"/><path fill=\"none\" stroke-linejoin=\"miter\" d=\"M11 14h23\"/></g></svg>","Q":"<svg class=\"piece\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" style=\"color-scheme:light only\"  viewBox=\"0 0 45 45\"><g fill=\"#faf9ee\" fill-rule=\"evenodd\" stroke=\"#575448\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\"><path d=\"M8 12a2 2 0 1 1-4 0 2 2 0 1 1 4 0m16.5-4.5a2 2 0 1 1-4 0 2 2 0 1 1 4 0M41 12a2 2 0 1 1-4 0 2 2 0 1 1 4 0M16 8.5a2 2 0 1 1-4 0 2 2 0 1 1 4 0M33 9a2 2 0 1 1-4 0 2 2 0 1 1 4 0\"/><path stroke-linecap=\"butt\" d=\"M9 26c8.5-1.5 21-1.5 27 0l2-12-7 11V11l-5.5 13.5-3-15-3 15-5.5-14V25L7 14z\"/><path stroke-linecap=\"butt\" d=\"M9 26c0 2 1.5 2 2.5 4 1 1.5 1 1 .5 3.5-1.5 1-1.5 2.5-1.5 2.5-1.5 1.5.5 2.5.5 2.5 6.5 1 16.5 1 23 0 0 0 1.5-1 0-2.5 0 0 .5-1.5-1-2.5-.5-2.5-.5-2 .5-3.5 1-2 2.5-2 2.5-4-8.5-1.5-18.5-1.5-27 0z\"/><path fill=\"none\" d=\"M11.5 30c3.5-1 18.5-1 22 0M12 33.5c6-1 15-1 21 0\"/></g></svg>","K":"<svg class=\"piece\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" style=\"color-scheme:light only\" viewBox=\"0 0 45 45\"><g fill=\"none\" fill-rule=\"evenodd\" stroke=\"#575448\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\"><path stroke-linejoin=\"miter\" d=\"M22.5 11.63V6M20 8h5\"/><path fill=\"#faf9ee\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" d=\"M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5\"/><path fill=\"#faf9ee\" d=\"M11.5 37c5.5 3.5 15.5 3.5 21 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-3.5-7.5-13-10.5-16-4-3 6 5 10 5 10z\"/><path d=\"M11.5 30c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0\"/></g></svg>","p":"<svg class=\"piece\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" style=\"color-scheme:light only\"  viewBox=\"0 0 45 45\"><path stroke=\"#3e3b35\" stroke-linecap=\"round\" stroke-width=\"1.5\" d=\"M22.5 9a4 4 0 0 0-3.22 6.38 6.48 6.48 0 0 0-.87 10.65c-3 1.06-7.41 5.55-7.41 13.47h23c0-7.92-4.41-12.41-7.41-13.47a6.46 6.46 0 0 0-.87-10.65A4.01 4.01 0 0 0 22.5 9z\"/></svg>","n":"<svg class=\"piece\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" style=\"color-scheme:light only\"  viewBox=\"0 0 45 45\"><g fill=\"none\" fill-rule=\"evenodd\" stroke=\"#3e3b35\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\"><path fill=\"#3e3b35\" d=\"M22 10c10.5 1 16.5 8 16 29H15c0-9 10-6.5 8-21\"/><path fill=\"#3e3b35\" d=\"M24 18c.38 2.91-5.55 7.37-8 9-3 2-2.82 4.34-5 4-1.04-.94 1.41-3.04 0-3-1 0 .19 1.23-1 2-1 0-4 1-4-4 0-2 6-12 6-12s1.89-1.9 2-3.5c-.73-1-.5-2-.5-3 1-1 3 2.5 3 2.5h2s.78-2 2.5-3c1 0 1 3 1 3\"/><path fill=\"#aca89a\" stroke=\"#aca89a\" d=\"M9.5 25.5a.5.5 0 1 1-1 0 .5.5 0 1 1 1 0m5.43-9.75a.5 1.5 30 1 1-.86-.5.5 1.5 30 1 1 .86.5\"/><path fill=\"#aca89a\" stroke=\"none\" d=\"m24.55 10.4-.45 1.45.5.15c3.15 1 5.65 2.49 7.9 6.75S35.75 29.06 35.25 39l-.05.5h2.25l.05-.5c.5-10.06-.88-16.85-3.25-21.34s-5.79-6.64-9.19-7.16z\"/></g></svg>","b":"<svg class=\"piece\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" style=\"color-scheme:light only\"  viewBox=\"0 0 45 45\"><g fill=\"none\" fill-rule=\"evenodd\" stroke=\"#3e3b35\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\"><g fill=\"#3e3b35\" stroke-linecap=\"butt\"><path d=\"M9 36c3.4-1 10.1.4 13.5-2 3.4 2.4 10.1 1 13.5 2 0 0 1.6.5 3 2-.7 1-1.6 1-3 .5-3.4-1-10.1.5-13.5-1-3.4 1.5-10.1 0-13.5 1-1.4.5-2.3.5-3-.5 1.4-2 3-2 3-2z\"/><path d=\"M15 32c2.5 2.5 12.5 2.5 15 0 .5-1.5 0-2 0-2 0-2.5-2.5-4-2.5-4 5.5-1.5 6-11.5-5-15.5-11 4-10.5 14-5 15.5 0 0-2.5 1.5-2.5 4 0 0-.5.5 0 2z\"/><path d=\"M25 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 1 1 5 0z\"/></g><path stroke=\"#aca89a\" stroke-linejoin=\"miter\" d=\"M17.5 26h10M15 30h15m-7.5-14.5v5M20 18h5\"/></g></svg>","r":"<svg class=\"piece\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" style=\"color-scheme:light only\"  viewBox=\"0 0 45 45\"><g fill-rule=\"evenodd\" stroke=\"#3e3b35\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\"><path stroke-linecap=\"butt\" d=\"M9 39h27v-3H9zm3.5-7 1.5-2.5h17l1.5 2.5zm-.5 4v-4h21v4z\"/><path stroke-linecap=\"butt\" stroke-linejoin=\"miter\" d=\"M14 29.5v-13h17v13z\"/><path stroke-linecap=\"butt\" d=\"M14 16.5 11 14h23l-3 2.5zM11 14V9h4v2h5V9h5v2h5V9h4v5z\"/><path fill=\"none\" stroke=\"#aca89a\" stroke-linejoin=\"miter\" stroke-width=\"1\" d=\"M12 35.5h21m-20-4h19m-18-2h17m-17-13h17M11 14h23\"/></g></svg>","q":"<svg class=\"piece\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" style=\"color-scheme:light only\"  viewBox=\"0 0 45 45\"><g fill-rule=\"evenodd\" stroke=\"#3e3b35\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\"><g stroke=\"none\"><circle cx=\"6\" cy=\"12\" r=\"2.75\"/><circle cx=\"14\" cy=\"9\" r=\"2.75\"/><circle cx=\"22.5\" cy=\"8\" r=\"2.75\"/><circle cx=\"31\" cy=\"9\" r=\"2.75\"/><circle cx=\"39\" cy=\"12\" r=\"2.75\"/></g><path stroke-linecap=\"butt\" d=\"M9 26c8.5-1.5 21-1.5 27 0l2.5-12.5L31 25l-.3-14.1-5.2 13.6-3-14.5-3 14.5-5.2-13.6L14 25 6.5 13.5z\"/><path stroke-linecap=\"butt\" d=\"M9 26c0 2 1.5 2 2.5 4 1 1.5 1 1 .5 3.5-1.5 1-1.5 2.5-1.5 2.5-1.5 1.5.5 2.5.5 2.5 6.5 1 16.5 1 23 0 0 0 1.5-1 0-2.5 0 0 .5-1.5-1-2.5-.5-2.5-.5-2 .5-3.5 1-2 2.5-2 2.5-4-8.5-1.5-18.5-1.5-27 0z\"/><path fill=\"none\" stroke-linecap=\"butt\" d=\"M11 38.5a35 35 1 0 0 23 0\"/><path fill=\"none\" stroke=\"#aca89a\" d=\"M11 29a35 35 1 0 1 23 0m-21.5 2.5h20m-21 3a35 35 1 0 0 22 0m-23 3a35 35 1 0 0 24 0\"/></g></svg>","k":"<svg class=\"piece\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\" style=\"color-scheme:light only\" viewBox=\"0 0 45 45\"><g fill=\"none\" fill-rule=\"evenodd\" stroke=\"#3e3b35\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\"><path stroke-linejoin=\"miter\" d=\"M22.5 11.6V6\"/><path fill=\"#3e3b35\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" d=\"M22.5 25s4.5-7.5 3-10.5c0 0-1-2.5-3-2.5s-3 2.5-3 2.5c-1.5 3 3 10.5 3 10.5\"/><path fill=\"#3e3b35\" d=\"M11.5 37a22.3 22.3 0 0 0 21 0v-7s9-4.5 6-10.5c-4-6.5-13.5-3.5-16 4V27v-3.5c-3.5-7.5-13-10.5-16-4-3 6 5 10 5 10z\"/><path stroke-linejoin=\"miter\" d=\"M20 8h5\"/><path stroke=\"#aca89a\" d=\"M32 29.5s8.5-4 6-9.7C34.1 14 25 18 22.5 24.6v2.1-2.1C20 18 9.9 14 7 19.9c-2.5 5.6 4.8 9 4.8 9\"/><path stroke=\"#aca89a\" d=\"M11.5 30c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0m-21 3.5c5.5-3 15.5-3 21 0\"/></g></svg>"};
+function svg(p){return pieceArt[p]||''}
+function square(i){return $('board').querySelector(`[data-i="${i}"]`)}
+function result(){let moves=Chess.legal(state);if(!moves.length)return Chess.check(state)?{text:`Мат. ${state.turn==='w'?'Чёрные':'Белые'} победили`,pgn:state.turn==='w'?'0-1':'1-0'}:{text:'Ничья — пат',pgn:'1/2-1/2'};if(state.half>=100)return {text:'Ничья — правило 50 ходов',pgn:'1/2-1/2'};if(keys.filter(k=>k===Chess.key(state)).length>=3)return {text:'Ничья — троекратное повторение',pgn:'1/2-1/2'};if(Chess.insufficient(state))return {text:'Ничья — недостаточно материала',pgn:'1/2-1/2'};return null}
+function render(){const b=$('board'),focused=document.activeElement,keepFocus=focused?.parentElement===b;if(keepFocus)boardFocus=+focused.dataset.i;b.innerHTML='';let king=Chess.check(state)?state.b.indexOf(state.turn==='w'?'K':'k'):-1;for(let v=0;v<64;v++){let i=flipped?63-v:v,r=i>>3,c=i%8,el=document.createElement('button');el.className='square'+((r+c)%2?' dark':'')+(last&&(i===last.f||i===last.t)?' last':'')+(selected===i?' selected':'')+(hint&&(i===hint.f||i===hint.t)?' hint':'')+(i===king?' check':'');el.dataset.i=i;el.tabIndex=i===boardFocus?0:-1;el.setAttribute('aria-label',Chess.name(i)+(state.b[i]?' '+({'p':'пешка','r':'ладья','n':'конь','b':'слон','q':'ферзь','k':'король'}[state.b[i].toLowerCase()])+' '+(Chess.color(state.b[i])==='w'?'белых':'чёрных'):''));if(state.b[i])el.innerHTML=svg(state.b[i]);if(last&&last.t===i&&$('moveReview').checked)el.innerHTML+=reviewBadge(history.length-1,true);if($('legalDots').checked&&possible.some(m=>m.t===i))el.innerHTML+=`<span class="${state.b[i]?'capture':'dot'}"></span>`;if(v%8===0)el.innerHTML+=`<span class="coord rank">${8-r}</span>`;if(v>=56)el.innerHTML+=`<span class="coord file">${'abcdefgh'[c]}</span>`;el.onclick=()=>pick(i);b.appendChild(el)}if(keepFocus)square(boardFocus)?.focus({preventScroll:true});let top=flipped?'w':'b',bottom=Chess.opp(top),who=c=>(mode==='rtc'?(c===net.side?'Вы':'Друг'):mode==='bot'?(c===human?'Вы':'Бот'):'Игрок')+' · '+(c==='w'?'Белые':'Чёрные');$('topName').textContent=who(top);$('bottomName').textContent=who(bottom);$('topAvatar').textContent=top==='w'?'♙':'♟';$('bottomAvatar').textContent=bottom==='w'?'♙':'♟';$('topTurn').textContent=state.turn===top?'● Ход':' ';$('bottomTurn').textContent=state.turn===bottom?'● Ход':' ';$('topSub').textContent=mode==='rtc'?(duel.token?'Онлайн · ':'WebRTC · ')+(net.connected?'подключено':'пауза'):mode==='bot'?'Уровень '+$('level').value:'На одном устройстве';$('bottomSub').textContent=history.length?`Ход ${state.full}`:'Хорошей игры!';updateStatus();$('moves').innerHTML=history.length?Array.from({length:Math.ceil(history.length/2)},(_,i)=>`<div class="move-row"><span>${i+1}.</span><span>${history[i*2]}${reviewBadge(i*2)}</span><span>${history[i*2+1]||''}${history[i*2+1]?reviewBadge(i*2+1):''}</span></div>`).join(''):'<p>История начнётся с первого хода.</p>';$('moves').scrollTop=$('moves').scrollHeight;$('undo').disabled=mode==='rtc'||busy||animating||!history.length;queueEnginePaint()}
+function updateStatus(extra){let end=result();gameResult=end?.pgn||'*';$('status').textContent=extra||end?.text||(mode==='rtc'&&!net.connected?'Связь прервана · партия приостановлена':busy?'Бот думает…':`${state.turn==='w'?'Ход белых':'Ход чёрных'}${Chess.check(state)?' · Шах!':''}`);let small=document.createElement('small');small.textContent=end?'Начните новую партию, чтобы сыграть ещё.':mode==='bot'?'Игра с ботом · без ограничения времени':mode==='rtc'?'Игра с другом · по сети':'Игра с другом · на одном устройстве';$('status').appendChild(small)}
+async function pick(i){if(mode==='rtc'&&(!net.connected||state.turn!==net.side))return;if(busy||animating||!$('promotion').hidden||result()||(mode==='bot'&&state.turn!==human))return;let matches=possible.filter(m=>m.t===i);if(matches.length){if(matches.length>1){$('promotion').hidden=false;$('choices').innerHTML='';for(let m of matches){let btn=document.createElement('button');btn.innerHTML=svg(state.turn==='w'?m.p.toUpperCase():m.p);btn.setAttribute('aria-label',({q:'Ферзь',r:'Ладья',b:'Слон',n:'Конь'})[m.p]);btn.onclick=()=>{$('promotion').hidden=true;play(m)};$('choices').appendChild(btn)}$('choices').firstChild.focus()}else play(matches[0]);return}selected=Chess.color(state.b[i])===state.turn?i:-1;possible=selected<0?[]:Chess.legal(state).filter(m=>m.f===i);hint=null;render()}
+async function play(m,remote=false){if(mode==='rtc'&&(!net.connected||(!remote&&state.turn!==net.side)))return;if(remote&&busy)cancelSearch();const token=generation;animating=true;$('undo').disabled=true;let a=square(m.f).getBoundingClientRect(),b=square(m.t).getBoundingClientRect();if($('animation').checked&&!matchMedia('(prefers-reduced-motion: reduce)').matches){let ghost=document.createElement('div');ghost.className='moving';ghost.style.cssText=`left:${a.left}px;top:${a.top}px;width:${a.width}px;height:${a.height}px`;ghost.innerHTML=svg(state.b[m.f]);document.body.appendChild(ghost);square(m.f).querySelector('svg').style.visibility='hidden';await new Promise(resolve=>requestAnimationFrame(()=>{requestAnimationFrame(()=>{ghost.style.transform=`translate(${b.left-a.left}px,${b.top-a.top}px)`;setTimeout(resolve,205)})}));ghost.remove()}if(token!==generation){animating=false;return}if(mode==='rtc'&&!remote){if(!net.connected){animating=false;render();return}try{net.channel.send(JSON.stringify({type:'move',ply:history.length,before:Chess.key(state),move:{f:m.f,t:m.t,p:m.p}}))}catch(e){animating=false;netFail('Не удалось отправить ход. Создайте новое подключение.');return}}let cap=!!state.b[m.t]||m.ep;uciMoves.push(Chess.name(m.f)+Chess.name(m.t)+(m.p||''));history.push(Chess.san(state,m));snapshots.push(state);state=Chess.apply(state,m);keys.push(Chess.key(state));last=m;hint=null;$('analysis').hidden=true;selected=-1;possible=[];animating=false;if(mode==='friend'&&$('autoFlip').checked)flipped=state.turn==='b';render();beep(cap,Chess.check(state));enqueueReview(history.length-1,m);scheduleBot();scheduleAutoHint()}
+let audio;function beep(capture,check){if(!$('sound').checked)return;try{audio||=new (window.AudioContext||window.webkitAudioContext)();audio.resume();let t=audio.currentTime;for(let j=0;j<(capture?2:1);j++){let o=audio.createOscillator(),g=audio.createGain();o.type=capture?'triangle':'sine';o.frequency.setValueAtTime(check?660:capture?190+j*110:440,t+j*.045);o.frequency.exponentialRampToValueAtTime(100,t+.11+j*.045);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.12,t+.008+j*.045);g.gain.exponentialRampToValueAtTime(.0001,t+.15+j*.045);o.connect(g).connect(audio.destination);o.start(t+j*.045);o.stop(t+.18+j*.045)}}catch(e){}}
+
+// The monitor renders measured UCI telemetry; it never fabricates engine reasoning.
+const engineView={visible:false,phase:'Ожидание',purpose:'',root:null,rootFen:'',side:'w',skill:20,depth:0,seldepth:null,nodes:null,nps:null,time:null,hash:null,current:null,currentNumber:null,score:null,kind:'cp',bound:'',pv:[],best:null,series:[],logs:[],timer:0,serial:0};
+function toggleEngineView(value){engineView.visible=value;$('enginePanel').hidden=!value;document.querySelector('main').classList.toggle('engine-open',value);$('toggleEngineView').setAttribute('aria-pressed',String(value));$('toggleEngineView').querySelector('span').textContent=value?'Вкл.':'Выкл.';if(value)paintEngineView()}
+$('openSettings').onclick=()=>{document.querySelector('[data-tab="settings"]').click();$('pane-settings').scrollIntoView({block:'nearest',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'})};
+$('toggleEngineView').onclick=()=>toggleEngineView(!engineView.visible);$('closeEngineView').onclick=()=>toggleEngineView(false);
+$('engineAnalyze').onclick=()=> $('hintButton').onclick();$('engineClearLog').onclick=()=>{engineView.logs=[];paintEngineView()};
+function engineLog(direction,line){engineView.logs.push(direction+' '+String(line).slice(0,1200));if(engineView.logs.length>160)engineView.logs.shift();queueEnginePaint()}
+function enginePhase(phase){engineView.phase=phase;if(engineView.visible)paintEngineView()}
+function beginEngineView(root,skill,depth,budget){Object.assign(engineView,{phase:'Загрузка',purpose:skill===20?'Полная сила':'Уровень '+skill+'/20',root,rootFen:toFen(root),side:root.turn,skill,depth:0,seldepth:null,nodes:null,nps:null,time:null,hash:null,current:null,currentNumber:null,score:null,kind:'cp',bound:'',pv:[],best:null,series:[]});engineView.serial++;engineLog('·','Поиск #'+engineView.serial+' | '+(root.turn==='w'?'белые':'чёрные')+' | depth '+depth+' | movetime '+budget+' мс');queueEnginePaint()}
+function observeEngineLine(line){engineLog('←',line);if(!line.startsWith('info '))return;for(let [key,pattern] of [['depth',/\bdepth (\d+)/],['seldepth',/\bseldepth (\d+)/],['nodes',/\bnodes (\d+)/],['nps',/\bnps (\d+)/],['time',/\btime (\d+)/],['hash',/\bhashfull (\d+)/],['currentNumber',/\bcurrmovenumber (\d+)/]]){let m=line.match(pattern);if(m&&(!line.includes('multipv ')||line.includes('multipv 1 ')))engineView[key]=+m[1]}let current=line.match(/\bcurrmove ([a-h][1-8][a-h][1-8][qrbn]?)/);if(current)engineView.current=current[1];if(line.includes('multipv ')&&!line.includes('multipv 1 '))return;let score=line.match(/\bscore (cp|mate) (-?\d+)/);if(score){engineView.kind=score[1];engineView.score=+score[2];engineView.bound=line.includes('lowerbound')?'Нижняя граница':line.includes('upperbound')?'Верхняя граница':'';let white=+score[2]*(engineView.side==='w'?1:-1),point={depth:engineView.depth,value:score[1]==='mate'?Math.sign(white)*1000:white};let old=engineView.series.findIndex(p=>p.depth===point.depth);if(old<0)engineView.series.push(point);else engineView.series[old]=point}let pv=line.match(/\bpv (.+)$/);if(pv)engineView.pv=pv[1].trim().split(/\s+/);queueEnginePaint()}
+function queueEnginePaint(){if(!engineView.visible||engineView.timer)return;engineView.timer=setTimeout(()=>{engineView.timer=0;paintEngineView()},100)}
+function engineSan(uci){if(!engineView.root||!uci)return '—';let m=uciMove(engineView.root,uci);return m?Chess.san(engineView.root,m):uci}
+function paintEngineView(){if(!engineView.visible)return;let v=engineView,fmt=n=>n===null?'—':n.toLocaleString('ru-RU');$('engineState').textContent=v.phase;$('enginePurpose').textContent=v.purpose;$('engineLamp').className=['Поиск','Загрузка','Инициализация'].includes(v.phase)?'running':v.phase==='Ошибка'?'error':'';$('engineContext').textContent=v.root?(v.side==='w'?'Белые':'Чёрные')+' · ход '+v.root.full+' · '+(v.rootFen===toFen(state)?'текущая позиция':'позиция последнего поиска'):'Сделайте ход против бота или запустите анализ.';let white=v.score===null?null:v.score*(v.side==='w'?1:-1);$('engineScore').textContent=white===null?'—':v.kind==='mate'?(white<0?'−':'')+'M'+Math.abs(v.score):(white>=0?'+':'')+(white/100).toFixed(2);$('engineEvalFill').style.height=(white===null?50:v.kind==='mate'?(white>=0?99:1):50+48*Math.tanh(white/500))+'%';$('engineBest').textContent=(v.best?'Выбран ход: ':'Лучший в поиске: ')+engineSan(v.best||v.pv[0]);$('engineDepth').textContent=v.depth?v.depth+' / '+(v.seldepth??'—'):'—';$('engineNodes').textContent=fmt(v.nodes);$('engineNps').textContent=fmt(v.nps);$('engineTime').textContent=v.time===null?'—':(v.time/1000).toFixed(2)+' с';$('engineHash').textContent=v.hash===null?'—':(v.hash/10).toFixed(1)+'%';$('engineCurrent').textContent=engineSan(v.current)+(v.currentNumber?' · '+v.currentNumber:'');$('engineBound').textContent=v.bound;let n=v.root,moves=[];if(n)for(let u of v.pv.slice(0,14)){let m=uciMove(n,u);if(!m)break;moves.push((n.turn==='w'?n.full+'. ':moves.length===0?n.full+'… ':'')+Chess.san(n,m));n=Chess.apply(n,m)}$('enginePv').textContent=moves.join(' ')||(v.root?'Ожидание основного продолжения…':'Движок ещё не запускался.');let series=v.series.slice().sort((a,b)=>a.depth-b.depth),max=Math.max(1,...series.map(p=>p.depth));$('engineChartPath').setAttribute('d',series.map((p,i)=>(i?'L':'M')+(p.depth/max*300).toFixed(1)+' '+(37-Math.tanh(p.value/500)*32).toFixed(1)).join(' '));$('engineLogCount').textContent=v.logs.length;let log=$('engineLog'),bottom=log.scrollHeight-log.clientHeight-log.scrollTop<25;log.textContent=v.logs.join('\n');if(bottom)log.scrollTop=log.scrollHeight;$('engineAnalyze').disabled=busy||animating||!!result()||(mode==='bot'&&state.turn!==human)||(mode==='rtc'&&(!net.connected||state.turn!==net.side))}
+
+let stockfishAssets=null,engineAssetURL=null;
+function releaseEngineAssets(){stockfishAssets=null;assetKind=null;if(engineAssetURL){URL.revokeObjectURL(engineAssetURL);engineAssetURL=null}}
+const ENGINE_CACHE_KEY='sf19-full-single-991bede2f253ebb08ff01fcc48270f4b9c8e66b12d5bd5f8d6f52eb3e3b3a740';
+let engineCacheSource='none';
+function cacheStatus(text){$('engineCacheStatus').textContent=text}
+function engineCache(action,value,key=ENGINE_CACHE_KEY){return new Promise(resolve=>{let done=false,db=null;let timer=setTimeout(()=>finish(null),3000);function finish(result){if(done)return;done=true;clearTimeout(timer);if(db)db.close();resolve(result)}try{let open=indexedDB.open('chess-offline-engine',1);open.onupgradeneeded=()=>{let d=open.result;if(!d.objectStoreNames.contains('compiled'))d.createObjectStore('compiled')};open.onerror=()=>finish(null);open.onblocked=()=>finish(null);open.onsuccess=()=>{db=open.result;if(done){db.close();return}try{let tx=db.transaction('compiled',action==='get'?'readonly':'readwrite'),store=tx.objectStore('compiled'),request=action==='get'?store.get(key):store.put(value,key),result=null;request.onsuccess=()=>{result=action==='get'?request.result:true};request.onerror=()=>finish(null);tx.oncomplete=()=>finish(result);tx.onerror=()=>finish(null);tx.onabort=()=>finish(null)}catch(e){finish(null)}}}catch(e){finish(null)}})}
+
+const ENGINE_DOWNLOAD_KEY=ENGINE_CACHE_KEY+'-download-v1';
+const ENGINE_DOWNLOAD_BASE='https://unpkg.com/stockfish@19.0.1/bin/';
+let engineDownloadTask=null;
+async function fetchEngineFile(name,expected,base=ENGINE_DOWNLOAD_BASE){
+ const response=await fetch(new URL(name,base));
+ if(!response.ok)throw Error('HTTP '+response.status+' при загрузке '+name);
+ let loaded=0,last=-1;const total=expected||Number(response.headers.get('content-length'))||0;
+ function progress(done=false){const percent=done?100:total?Math.min(99,Math.floor(loaded/total*100)):0;if(percent===last&&!done)return;last=percent;$('engineDownloadProgress').value=percent;cacheStatus(name+' · '+percent+'%');engineLog('·','Загрузка '+name+': '+percent+'%')}
+ progress();let blob;
+ if(response.body){const reader=response.body.getReader();blob=await new Response(new ReadableStream({async pull(controller){try{const part=await reader.read();if(part.done){controller.close();return}loaded+=part.value.byteLength;progress();controller.enqueue(part.value)}catch(e){controller.error(e)}},cancel(reason){return reader.cancel(reason)}})).blob()}
+ else{blob=await response.blob();loaded=blob.size}
+ if(expected&&blob.size!==expected)throw Error('Неполный файл '+name);
+ progress(true);return blob;
+}
+function downloadStockfish(base=ENGINE_DOWNLOAD_BASE){
+ if(engineDownloadTask)return engineDownloadTask;
+ $('downloadEngine').disabled=true;$('engineDownloadProgress').hidden=false;
+ engineDownloadTask=(async()=>{
+  const js=await fetchEngineFile('stockfish-19-single.js',28130,base);
+  if(!(await js.text()).includes('e()(i).then(d).catch'))throw Error('Несовместимая сборка Stockfish');
+  const wasm=await fetchEngineFile('stockfish-19-single.wasm',99169054,base);
+  // Commit the matching loader and WASM together; interrupted downloads never replace a working cache.
+  if(!await engineCache('put',{js,wasm},ENGINE_DOWNLOAD_KEY))throw Error('Браузер не сохранил кэш. Встроенный движок остаётся доступен.');
+  if(!busy){disposeEngine();releaseEngineAssets()}
+  cacheStatus('Полный SF19 сохранён. Следующий запуск движка — из IndexedDB, без интернета.');
+  return true;
+ })().finally(()=>{engineDownloadTask=null;$('downloadEngine').disabled=false;$('engineDownloadProgress').hidden=true});
+ return engineDownloadTask;
+}
+$('downloadEngine').onclick=()=>downloadStockfish().catch(e=>{cacheStatus('Загрузка не завершена: '+e.message);engineLog('!',e.message)});
+
+let assetKind=null,residentEngine=null,activeEngineKind='full',fallbackActive=false,engineWorkerCount=0;
+function phoneMemoryMode(){return $('engineMemory').value==='mobile'||($('engineMemory').value==='auto'&&(/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)||navigator.userAgentData?.mobile))}
+function engineTitle(){return activeEngineKind==='lite'?'Stockfish 19 Lite':'Stockfish 19'}
+function setEngineKind(kind,reason=''){activeEngineKind=kind;$('activeEngineName').textContent=engineTitle();$('activeEngineBuild').textContent=(kind==='lite'?'LITE NNUE':'SFNNv16')+' · 1 THREAD';$('engineRuntimeNote').textContent=reason||(kind==='lite'?'Работает резерв Stockfish 19 Lite: меньшая NNUE-сеть и расход памяти.':'Работает полный Stockfish 19'+(phoneMemoryMode()?' · экономия памяти · Hash 1 МБ.':'.'))}
+function disposeEngine(){if(residentEngine){residentEngine.w.terminate();residentEngine=null}if(worker){worker.terminate();worker=null}}
+$('engineMemory').onchange=()=>{cancelSearch();disposeEngine();fallbackActive=false;setEngineKind($('engineMemory').value==='lite'?'lite':'full');scheduleBot()};
+function unpackEngineStream(id){let packed=$(id).textContent.trim(),offset=0;return new ReadableStream({pull(controller){if(offset>=packed.length){packed='';controller.close();return}let bin=atob(packed.slice(offset,offset+32768)),bytes=new Uint8Array(bin.length);offset+=32768;for(let j=0;j<bin.length;j++)bytes[j]=bin.charCodeAt(j);controller.enqueue(bytes)},cancel(){packed=''}}).pipeThrough(new DecompressionStream('gzip'))}
+function stockfishURLs(kind='full'){
+if(assetKind!==kind)releaseEngineAssets();
+assetKind=kind;
+if(!stockfishAssets){
+const loading=(async()=>{
+if(!window.WebAssembly)throw Error('Нужен браузер с WebAssembly');
+const key=kind==='full'?ENGINE_CACHE_KEY:'sf19-lite-single-v19.0.1';
+let bundle=kind==='full'?await engineCache('get',null,ENGINE_DOWNLOAD_KEY):null;
+let cached=bundle?.wasm instanceof Blob?bundle.wasm:await engineCache('get',null,key),module;
+let loader=bundle?.js instanceof Blob?await bundle.js.text():null;
+if(loader&&!loader.includes('e()(i).then(d).catch')){cached=null;loader=null}
+const compile=stream=>{const response=new Response(stream,{headers:{'Content-Type':'application/wasm'}});return WebAssembly.compileStreaming?WebAssembly.compileStreaming(response):response.arrayBuffer().then(bytes=>WebAssembly.compile(bytes))};
+cacheStatus('Проверяю сохранённый '+engineTitle()+'…');
+if(cached instanceof Blob){
+try{module=await compile(cached.stream());engineCacheSource='indexeddb';cacheStatus(engineTitle()+' загружен из кэша, без распаковки.');engineLog('·','WASM из IndexedDB; потоковая компиляция')}
+catch(e){engineLog('!','Повреждённый кэш WASM; повторная загрузка из HTML');cached=null;loader=null}
+}
+if(!module){
+if(!window.DecompressionStream)throw Error('Нужен браузер с DecompressionStream');
+engineCacheSource='embedded';cacheStatus('Потоковая подготовка '+engineTitle()+'…');
+let stream=unpackEngineStream(kind==='full'?'sfWasm':'sfLiteWasm');
+// A parallel decompressed Blob can exceed 100 MB; phones compile without that extra allocation.
+if(!phoneMemoryMode()||kind==='lite'){
+let streams=stream.tee();stream=streams[0];
+new Response(streams[1]).blob().then(blob=>engineCache('put',blob,key)).then(saved=>cacheStatus(saved?'Stockfish сохранён в браузере. Следующие запуски быстрее.':'Кэш недоступен; Stockfish работает из HTML.')).catch(()=>cacheStatus('Кэш недоступен; Stockfish работает из HTML.'));
+}
+module=await compile(stream);
+if(phoneMemoryMode()&&kind==='full')cacheStatus('Экономия памяти: кэш распакованного WASM не создаётся.');
+engineLog('·','WASM распакован и скомпилирован потоком, без большого JS-буфера');
+}
+let js=loader||atob($(kind==='full'?'sfJs':'sfLiteJs').textContent.trim());
+const marker='e()(i).then(d).catch';
+if(!js.includes(marker))throw Error('Несовместимая встроенная сборка Stockfish 19');
+js=js.replace(marker,'i.instantiateWasm=function(imports,receive){WebAssembly.instantiate(self.__compiled,imports).then(function(instance){receive(instance,self.__compiled)}).catch(function(e){postMessage("offline-init-error "+String(e))});return {}};'+marker);
+let boot='/* Offline resident worker. */ self.onmessage=function(init){self.__compiled=init.data;self.onmessage=null;'+js+'};';
+let url=URL.createObjectURL(new Blob([boot],{type:'text/javascript'}));
+if(stockfishAssets!==loading){URL.revokeObjectURL(url);throw Error('Поиск отменён')}
+engineAssetURL=url;
+return {module,js:url,kind};
+})();
+stockfishAssets=loading;
+loading.catch(()=>{if(stockfishAssets===loading)stockfishAssets=null});
+}
+return stockfishAssets;
+}
+function toFen(s){let rows=[];for(let r=0;r<8;r++){let row='',empty=0;for(let c=0;c<8;c++){let p=s.b[r*8+c];if(!p)empty++;else{if(empty)row+=empty;empty=0;row+=p}}if(empty)row+=empty;rows.push(row)}return rows.join('/')+' '+s.turn+' '+(s.castle||'-')+' '+(s.ep<0?'-':Chess.name(s.ep))+' '+s.half+' '+s.full}
+function uciMove(s,text){return Chess.legal(s).find(m=>Chess.name(m.f)+Chess.name(m.t)+(m.p||'')===text)}
+function cancelSearch(){if(busy)enginePhase('Отменено');generation++;if(searchAbort){searchAbort();searchAbort=null}if(worker){worker.terminate();worker=null}busy=false}
+async function runEngineSearch(depth,budget,skill=20,kind='full',context={}){setEngineKind(kind,fallbackActive?'Полная сборка завершилась с ошибкой. Работает резерв Stockfish 19 Lite.':'');let current=context.root||state;beginEngineView(current,skill,depth,budget);if(context.purpose)engineView.purpose=context.purpose;busy=true;render();let token=generation,position=context.position||('position fen '+toFen(snapshots[0]||state)+(uciMoves.length?' moves '+uciMoves.join(' '):''));let assets;try{updateStatus('Загрузка Stockfish 19…');assets=residentEngine?.kind===kind?null:await stockfishURLs(kind)}catch(e){enginePhase('Ошибка');engineLog('!',e.message);busy=false;render();throw e}if(token!==generation)throw Error('Поиск отменён');enginePhase('Инициализация');if(token!==generation)throw Error('Поиск отменён');return new Promise((resolve,reject)=>{let fresh=!residentEngine||residentEngine.kind!==kind;if(fresh){disposeEngine();let created;try{created=new Worker(assets.js)}catch(e){if(token===generation){busy=false;enginePhase('Ошибка');render()}reject(e);return}residentEngine={w:created,kind};engineWorkerCount++}let w=worker=residentEngine.w,timer,stage='uci',info={depth:0,nodes:0,pv:[],score:0,kind:'cp'},lines={};let done=false;function finish(error,result){if(done)return;done=true;enginePhase(error?(token!==generation?'Отменено':'Ошибка'):'Завершён');if(error)engineLog('!',error.message);clearTimeout(timer);if(error){w.terminate();if(residentEngine?.w===w)residentEngine=null}else{w.onerror=e=>{engineLog('!',e.message||'Сбой простаивающего движка');w.terminate();if(residentEngine?.w===w)residentEngine=null}}if(worker===w)worker=null;searchAbort=null;if(token===generation){busy=false;render()}error?reject(error):resolve(result)}searchAbort=()=>finish(Error('Поиск отменён'));timer=setTimeout(()=>finish(Error('Движок не ответил вовремя')),budget+60000);w.onerror=e=>{e.preventDefault();finish(Error(e.message||'Ошибка WebAssembly'))};function send(command){if(done)return;engineLog('→',command);try{w.postMessage(command)}catch(e){finish(e)}}w.onmessage=e=>{if(token!==generation)return;let line=String(e.data);observeEngineLine(line);if(line.startsWith('info depth ')){let slot=line.match(/ multipv (\d+)/),d=line.match(/ depth (\d+)/),v=line.match(/ score (cp|mate) (-?\d+)/),pv=line.match(/ pv (.+)$/);if(d&&v&&pv&&!line.includes('lowerbound')&&!line.includes('upperbound'))lines[slot?+slot[1]:1]={depth:+d[1],kind:v[1],score:+v[2],pv:pv[1].trim().split(/\s+/)}}if(line.startsWith('offline-init-error ')){finish(Error(line.slice(19)));return}if(line==='uciok'&&stage==='uci'){stage='ready';send('setoption name Threads value 1');send('setoption name Ponder value false');send('setoption name Hash value '+(phoneMemoryMode()?1:$('engineMemory').value==='full32'?32:16));send('setoption name MultiPV value '+(context.multipv||1));send('setoption name Skill Level value '+skill);send('setoption name UCI_LimitStrength value false');send('isready')}else if(line==='readyok'&&stage==='ready'){stage='search';enginePhase('Поиск');send(position);send('go depth '+depth+' movetime '+budget+(context.searchmoves?.length?' searchmoves '+context.searchmoves.join(' '):''));updateStatus(engineTitle()+' анализирует…')}else if(line.startsWith('info depth ')&&(!line.includes('multipv ')||line.includes('multipv 1 '))){let d=line.match(/ depth (\d+)/),n=line.match(/ nodes (\d+)/),v=line.match(/ score (cp|mate) (-?\d+)/),pv=line.match(/ pv (.+)$/);if(d&&pv){info={depth:+d[1],nodes:n?+n[1]:0,pv:pv[1].trim().split(/\s+/),score:v?+v[2]:info.score,kind:v?v[1]:info.kind};if(skill===20)updateStatus(engineTitle()+' · глубина '+info.depth+' · '+info.nodes.toLocaleString('ru-RU')+' позиций')}}else if(line.startsWith('bestmove ')){let best=line.split(/\s+/)[1],move=uciMove(current,best);if(!move){finish(Error('Stockfish вернул недопустимый ход'));return}engineView.best=best;finish(null,{...info,lines,move,engine:engineTitle()})}};if(fresh)try{w.postMessage(assets.module)}catch(e){finish(e);return}send('uci')})}
+async function compute(depth,budget,skill=20,context={}){if(busy)throw Error('Движок уже выполняет поиск');let mobile=phoneMemoryMode(),kind=$('engineMemory').value==='lite'||fallbackActive?'lite':'full';if(mobile){depth=Math.min(depth,20);budget=Math.min(budget,3500)}let token=generation;try{return await runEngineSearch(depth,budget,skill,kind,context)}catch(e){if(token!==generation)throw e;if(kind==='full'&&/memory|out of bounds|WebAssembly|RuntimeError|allocation|unreachable/i.test(e.message)){disposeEngine();fallbackActive=true;releaseEngineAssets();setEngineKind('lite','Полная сборка завершилась с ошибкой памяти. Перезапускаю анализ в Stockfish 19 Lite.');engineLog('!','Автоматический резерв: '+e.message);await new Promise(r=>setTimeout(r,100));if(token!==generation)throw Error('Поиск отменён');return runEngineSearch(Math.min(depth,20),Math.min(budget,3500),skill,'lite',context)}throw e}}
+function scheduleBot(){if(mode!=='bot'||state.turn===human||result()||busy||animating)return;let token=generation,l=+$('level').value;setTimeout(async()=>{if(token!==generation||busy||animating||mode!=='bot'||state.turn===human||result())return;try{let found=await compute([0,4,8,14,22][l],[0,250,700,1600,3200][l],[0,0,5,12,20][l]);if(token===generation&&found.move)play(found.move)}catch(e){if(token===generation)updateStatus('Stockfish: '+e.message)}},180)}
+function start(m,network=false){if(animating)return;resetMoveReviews();if(!network)closeNet();cancelSearch();mode=m;human=$('color').value;state=Chess.initial();history=[];uciMoves=[];snapshots=[];keys=[Chess.key(state)];last=hint=null;$('analysis').hidden=true;selected=-1;possible=[];flipped=m==='rtc'?net.side==='b':m==='bot'?human==='b':false;$('promotion').hidden=true;autoLastPosition='';autoHintSide=mode==='bot'?human:mode==='rtc'?net.side:'w';render();scheduleBot();scheduleAutoHint()}
+$('board').addEventListener('keydown',e=>{let cell=e.target.closest('[data-i]');if(!cell||e.altKey||e.ctrlKey||e.metaKey)return;let v=flipped?63-Number(cell.dataset.i):Number(cell.dataset.i),r=v>>3,c=v%8,target=v;if(e.key==='ArrowLeft')target=r*8+Math.max(0,c-1);else if(e.key==='ArrowRight')target=r*8+Math.min(7,c+1);else if(e.key==='ArrowUp')target=Math.max(0,r-1)*8+c;else if(e.key==='ArrowDown')target=Math.min(7,r+1)*8+c;else if(e.key==='Home')target=r*8;else if(e.key==='End')target=r*8+7;else return;e.preventDefault();boardFocus=flipped?63-target:target;for(let b of $('board').children)b.tabIndex=Number(b.dataset.i)===boardFocus?0:-1;square(boardFocus)?.focus({preventScroll:true})});
+$('newBot').onclick=()=>start('bot');$('newFriend').onclick=()=>start('friend');$('flip').onclick=()=>{if(animating)return;flipped=!flipped;render()};$('undo').onclick=()=>{if(animating||mode==='rtc')return;reviewEpoch++;reviewJobs=[];cancelSearch();$('promotion').hidden=true;if(!snapshots.length)return;do{state=snapshots.pop();history.pop();moveReviews.pop();uciMoves.pop();keys.pop()}while(mode==='bot'&&state.turn!==human&&snapshots.length);last=null;selected=-1;possible=[];hint=null;$('analysis').hidden=true;autoLastPosition='';if($('moveReview').checked)for(let i=0;i<history.length;i++)if(!moveReviews[i]||['pending','unavailable'].includes(moveReviews[i].type)){let m=uciMove(snapshots[i],uciMoves[i]);if(m)enqueueReview(i,m)}render();drainMoveReviews();scheduleBot();scheduleAutoHint()};document.querySelectorAll('.tab').forEach(btn=>btn.onclick=()=>{if(btn.dataset.tab!=='friend'){stopScanner();$('cameraHelp').hidden=true;}document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b===btn));document.querySelectorAll('.pane').forEach(p=>p.hidden=p.id!=='pane-'+btn.dataset.tab)});$('legalDots').onchange=render;$('theme').onchange=()=>{let wood=$('theme').value==='wood';document.documentElement.style.setProperty('--light',wood?'#f0d9b5':'#e4e8c8');document.documentElement.style.setProperty('--dark',wood?'#b58863':'#779556')};
+let versionTaps=0,lastVersionTap=0;$('version').onclick=()=>{let now=Date.now();versionTaps=now-lastVersionTap<1800?versionTaps+1:1;lastVersionTap=now;if(versionTaps>=7){$('hintButton').hidden=!$('hintButton').hidden;$('autoHintButton').hidden=$('hintButton').hidden;if($('hintButton').hidden)setAutoHint(false);versionTaps=0;if(navigator.vibrate)navigator.vibrate(30)}};$('hintButton').onclick=async()=>{if(busy||animating||result()||!$('promotion').hidden||(mode==='bot'&&state.turn!==human)||(mode==='rtc'&&(!net.connected||state.turn!==net.side)))return;let token=generation;hint=null;$('analysis').hidden=false;$('analysis').textContent='Stockfish 19 · расчёт…';try{autoLastPosition=autoPositionKey();let fast=$('hintSpeed').value==='fast';let found=await compute(fast?12:24,fast?800:6500,20);if(token!==generation)return;hint=found.move;selected=-1;possible=[];render();let n=state,variation=[];for(let u of found.pv.slice(0,8)){let m=uciMove(n,u);if(!m)break;variation.push(Chess.san(n,m));n=Chess.apply(n,m)}let whiteScore=found.score*(state.turn==='w'?1:-1),evaluation=found.kind==='mate'?'Мат через '+Math.abs(found.score):'Оценка за белых: '+(whiteScore>=0?'+':'')+(whiteScore/100).toFixed(2);$('analysis').textContent=found.engine+' · '+Chess.san(state,hint)+' · глубина '+found.depth+'\n'+evaluation+'\n'+variation.join(' ');updateStatus('Рекомендация: '+Chess.name(hint.f)+' → '+Chess.name(hint.t)+(hint.p?' = '+hint.p.toUpperCase():''))}catch(e){if(token!==generation)return;$('analysis').textContent='Не удалось выполнить анализ: '+e.message;updateStatus('Ошибка анализа')}};
+// Manual SDP exchange: host candidates only, no STUN, TURN, signaling or media servers.
+
+
+let autoHintEnabled=false,autoHintSide='w',autoLastPosition='',autoHintTimer=0;
+function autoPositionKey(){return history.length+':'+Chess.key(state)}
+function setAutoHint(value){autoHintEnabled=value;autoHintSide=mode==='bot'?human:mode==='rtc'?net.side:state.turn;autoLastPosition='';clearTimeout(autoHintTimer);$('autoHintButton').setAttribute('aria-pressed',String(value));$('autoHintButton').title='Автоанализ: '+(value?'включён':'выключен');if(value)scheduleAutoHint()}
+$('autoHintButton').onclick=()=>setAutoHint(!autoHintEnabled);
+function scheduleAutoHint(){clearTimeout(autoHintTimer);if(!autoHintEnabled||state.turn!==autoHintSide||result())return;autoHintTimer=setTimeout(async()=>{if(!autoHintEnabled||busy||animating||reviewRunning||reviewJobs.length||state.turn!==autoHintSide||!$('promotion').hidden||result()||autoLastPosition===autoPositionKey())return;await $('hintButton').onclick()},160)}
+
+// Public reference: Chess.com Expected Points thresholds and sacrifice/critical-move criteria.
+// Our probability curve and tactical verification are local heuristics, not their private rating model.
+const gradeNames={brilliant:'Бриллиантовый ход',great:'Великолепный ход',best:'Лучший ход',excellent:'Отличный ход',good:'Хороший ход',book:'Дебютный ход',inaccuracy:'Неточность',mistake:'Ошибка',miss:'Упущенная возможность',blunder:'Зевок',pending:'Оценка Stockfish',unavailable:'Оценка недоступна'};
+const gradeSymbols={brilliant:'!!',great:'!',best:'★',excellent:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 10l4-8c3 0 3 2 2 6h6c2 0 2 2 1 4l-3 8H8zM2 10h4v11H2z"/></svg>',good:'✓',book:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 4c4-1 7 0 9 2v15c-2-2-5-3-9-2zm20 0c-4-1-7 0-9 2v15c2-2 5-3 9-2z"/></svg>',inaccuracy:'?!',mistake:'?',miss:'×',blunder:'??',pending:'',unavailable:''};
+let moveReviews=[],reviewJobs=[],reviewRunning=false,reviewEpoch=0,reviewSequence=0;
+const reviewBookLines=[
+'e2e4 e7e5 g1f3 b8c6 f1b5 a7a6 b5a4 g8f6 e1g1 f8e7 f1e1 b7b5 a4b3 d7d6',
+'e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 c2c3 g8f6 d2d3 d7d6',
+'e2e4 e7e5 g1f3 b8c6 f1c4 g8f6 d2d3 f8c5',
+'e2e4 e7e5 g1f3 g8f6 f3e5 d7d6 e5f3 f6e4 d2d4',
+'e2e4 c7c5 g1f3 d7d6 d2d4 c5d4 f3d4 g8f6 b1c3 a7a6',
+'e2e4 c7c5 g1f3 b8c6 d2d4 c5d4 f3d4 g8f6 b1c3',
+'e2e4 e7e6 d2d4 d7d5 b1c3 g8f6 e4e5 f6d7',
+'e2e4 c7c6 d2d4 d7d5 b1c3 d5e4 c3e4',
+'d2d4 d7d5 c2c4 e7e6 b1c3 g8f6 c1g5 f8e7',
+'d2d4 d7d5 c2c4 c7c6 g1f3 g8f6 b1c3',
+'d2d4 g8f6 c2c4 e7e6 b1c3 f8b4',
+'d2d4 g8f6 c2c4 g7g6 b1c3 f8g7 e2e4 d7d6',
+'d2d4 d7d5 g1f3 g8f6 c1f4 e7e6 e2e3',
+'c2c4 e7e5 b1c3 g8f6 g1f3 b8c6',
+'g1f3 d7d5 d2d4 g8f6 c2c4 e7e6'
+];
+function reviewBadge(i,onBoard=false){if(!$('moveReview').checked)return '';let r=moveReviews[i];if(!r)return '';let type=r.type||'pending';return '<span class="grade grade-'+type+(onBoard?' grade-board':'')+'" role="img" aria-label="'+gradeNames[type]+'" title="'+gradeNames[type]+'">'+gradeSymbols[type]+'</span>'}
+function moveUci(m){return Chess.name(m.f)+Chess.name(m.t)+(m.p||'')}
+function resetMoveReviews(){reviewEpoch++;reviewJobs=[];moveReviews=[]}
+function refreshReviewBadges(){render()}
+$('moveReview').onchange=()=>{reviewEpoch++;reviewJobs=[];if(!$('moveReview').checked){if(busy&&engineView.purpose==='Оценка хода')cancelSearch()}else for(let i=0;i<history.length;i++)if(!moveReviews[i]||['pending','unavailable'].includes(moveReviews[i].type)){let m=uciMove(snapshots[i],uciMoves[i]);if(m)enqueueReview(i,m)}render();drainMoveReviews()};
+function bookMove(i){let prefix=uciMoves.slice(0,i+1).join(' ');return snapshots[0]&&toFen(snapshots[0])===toFen(Chess.initial())&&reviewBookLines.some(line=>line===prefix||line.startsWith(prefix+' '))}
+function enqueueReview(index,m){if(!$('moveReview').checked)return;let job={id:++reviewSequence,index,epoch:reviewEpoch,before:snapshots[index],after:Chess.apply(snapshots[index],m),move:m,uci:moveUci(m),position:'position fen '+toFen(snapshots[0])+(index?' moves '+uciMoves.slice(0,index).join(' '):''),type:'pending'};moveReviews[index]=job;if(bookMove(index)){job.type='book';render();return}reviewJobs.push(job);render();drainMoveReviews()}
+function expectedPoints(result){if(result.kind==='mate')return result.score>0?1:0;return 1/(1+Math.exp(-Math.max(-2000,Math.min(2000,result.score))/250))}
+const reviewValue={p:100,n:320,b:335,r:500,q:900,k:20000};
+function materialBalance(s,side){let total=0;for(let p of s.b)if(p&&p.toLowerCase()!=='k')total+=(Chess.color(p)===side?1:-1)*reviewValue[p.toLowerCase()];return total}
+function exchangeGain(s,m,depth=0){let victim=m.ep?'p':s.b[m.t],gain=victim?reviewValue[victim.toLowerCase()]:0;if(m.p)gain+=reviewValue[m.p]-100;if(depth>=5)return gain;let n=Chess.apply(s,m),recaptures=Chess.legal(n).filter(x=>x.t===m.t);let reply=0;for(let r of recaptures)reply=Math.max(reply,exchangeGain(n,r,depth+1));return gain-reply}
+function realSacrifice(job){let side=job.before.turn,initialGain=job.before.b[job.move.t]?reviewValue[job.before.b[job.move.t].toLowerCase()]:job.move.ep?100:0;let priorThreats=null;let candidates=Chess.legal(job.after).filter(m=>{let p=job.after.b[m.t];return p&&Chess.color(p)===side&&['n','b','r','q'].includes(p.toLowerCase())});for(let capture of candidates){let netLoss=exchangeGain(job.after,capture)-initialGain;if(netLoss<150)continue;if(capture.t!==job.move.t){priorThreats||=Chess.legal({...job.before,turn:Chess.opp(side),ep:-1});let priorLoss=0;for(let old of priorThreats)if(old.t===capture.t)priorLoss=Math.max(priorLoss,exchangeGain({...job.before,turn:Chess.opp(side),ep:-1},old));if(netLoss-priorLoss<150)continue}return {target:capture.t,loss:netLoss,capture:moveUci(capture)}}return null}
+function classifyReview({isBest,before,actual,second=null,sacrifice=false,endgame=false,material=0,previous=null,depth=0}){let bestEP=expectedPoints(before),actualEP=expectedPoints(actual),loss=Math.max(0,bestEP-actualEP),secondEP=second?expectedPoints(second):null,near=loss<=.02,unique=secondEP!==null&&bestEP-secondEP>=.10&&actualEP>=.45&&((bestEP>=.75&&secondEP<.65)||(bestEP>=.45&&secondEP<.45));let opportunity=previous&&previous.bestEP!==null&&previous.actualEP!==null&&(1-previous.bestEP<.65)&&(1-previous.actualEP>=.75);let recovered=previous&&previous.bestEP!==null&&previous.actualEP!==null&&(1-previous.bestEP<.3)&&(1-previous.actualEP>=.45)&&actualEP>=.45;let type;if(near&&actualEP>=.45&&sacrifice&&depth>=10&&Math.abs(material)<500&&secondEP!==null&&secondEP<.9&&(!endgame||unique))type='brilliant';else if(near&&depth>=10&&(unique||(opportunity&&actualEP>=.75)||recovered))type='great';else if(loss>=.1&&opportunity&&bestEP>=.75&&actualEP<=.60)type='miss';else if(isBest&&near)type='best';else if(loss<=.02)type='excellent';else if(loss<=.05)type='good';else if(loss<=.10)type='inaccuracy';else if(loss<=.20)type='mistake';else type='blunder';return {type,bestEP,actualEP,loss,secondEP}}
+function terminalLine(s){let moves=Chess.legal(s);if(!moves.length)return {kind:Chess.check(s)?'mate':'cp',score:Chess.check(s)?-1:0,pv:[],depth:99};if(Chess.insufficient(s)||s.half>=100)return {kind:'cp',score:0,pv:[],depth:99};return null}
+async function evaluateReview(job){let mobile=phoneMemoryMode(),depth=mobile?14:17,budget=mobile?550:850,context={root:job.before,position:job.position,multipv:2,purpose:'Оценка хода'};let best=await compute(depth,budget,20,context);if(job.epoch!==reviewEpoch)throw Error('Оценка отменена');let primary=best.lines[1]||best,second=best.lines[2]||null,actual=null,isBest=moveUci(best.move)===job.uci;let terminal=terminalLine(job.after);if(terminal)actual={...terminal,score:-terminal.score,pv:[job.uci],depth:99};else if(isBest)actual=primary;else if(second?.pv[0]===job.uci)actual=second;else{let forced=await compute(depth,budget,20,{...context,multipv:1,searchmoves:[job.uci]});if(moveUci(forced.move)!==job.uci)throw Error('Движок не подтвердил сыгранный ход');actual=forced.lines[1]||forced}if(job.epoch!==reviewEpoch)throw Error('Оценка отменена');let sacrifice=realSacrifice(job),pieceCount=job.before.b.filter(p=>p&&!['p','k'].includes(p.toLowerCase())).length,endgame=pieceCount<=4,previous=moveReviews[job.index-1],classified=classifyReview({isBest,before:primary,actual,second,sacrifice:!!sacrifice,endgame,material:materialBalance(job.before,job.before.turn),previous,depth:Math.min(primary.depth||0,actual.depth||0,second?.depth??99)});return {...classified,engine:best.engine,bestMove:moveUci(best.move),depth:Math.min(primary.depth||0,actual.depth||0),sacrifice}}
+async function drainMoveReviews(){if(reviewRunning||!$('moveReview').checked||!reviewJobs.length)return;if(busy||animating){setTimeout(drainMoveReviews,120);return}reviewRunning=true;try{while(reviewJobs.length&&$('moveReview').checked){if(busy||animating)break;let job=reviewJobs.shift();if(job.epoch!==reviewEpoch||moveReviews[job.index]!==job)continue;try{let result=await evaluateReview(job);if(job.epoch===reviewEpoch&&moveReviews[job.index]===job)Object.assign(job,result)}catch(e){if(job.epoch!==reviewEpoch||moveReviews[job.index]!==job)continue;if(/отменён/.test(e.message)){reviewJobs.unshift(job);break}job.type='unavailable';job.error=e.message}if(job.epoch===reviewEpoch)refreshReviewBadges()}}finally{reviewRunning=false;if(reviewJobs.length&&$('moveReview').checked)setTimeout(drainMoveReviews,120);else{scheduleBot();scheduleAutoHint()}}}
+
+
+
+const duel={epoch:0,lobby:null,room:null,timer:null,token:null,phase:'idle',peer:null,pending:null};
+let trysteroModule=null;
+function loadTrystero(){if(!trysteroModule)trysteroModule=import('https://esm.sh/trystero@0.26.0?bundle').catch(e=>{trysteroModule=null;throw e});return trysteroModule}
+function duelStatus(text){$('duelStatus').textContent=text}
+function closeDuel(){duel.epoch++;clearInterval(duel.timer);duel.timer=null;duel.token=null;duel.phase='idle';duel.peer=null;duel.pending=null;duel.lobby?.leave();duel.room?.leave();duel.lobby=duel.room=null;$('findDuel').disabled=false;$('cancelDuel').hidden=true;duelStatus('Поиск остановлен')}
+$('cancelDuel').onclick=()=>{closeNet();if(mode==='rtc')render()};
+$('findDuel').onclick=async()=>{
+ if(animating)return;closeNet();const epoch=duel.epoch;duel.phase='loading';$('findDuel').disabled=true;$('cancelDuel').hidden=false;duelStatus('Подключаю Trystero…');
+ try{
+ if(!globalThis.crypto?.subtle)throw Error('Откройте HTML локальным файлом или через HTTPS: Trystero нужен Web Crypto');
+ const api=await Promise.race([loadTrystero(),new Promise((_,reject)=>setTimeout(()=>reject(Error('CDN Trystero не ответил')),20000))]);if(epoch!==duel.epoch)return;
+ const config={appId:'offline-chess-sf19-duels-v1'},self=api.selfId,lobby=duel.lobby=api.joinRoom(config,'public-queue-v1');duel.phase='search';const action=lobby.makeAction('match');let peers=new Map();
+ const send=(data,id)=>action.send(data,{target:id}).catch(()=>{});
+ function status(){duelStatus('Ищем соперника… Поиск продолжается, пока другой игрок не нажмёт «Искать дуэль».')}
+ function reset(){duel.pending=null;duel.phase='search';status()}
+ function privateRoom(id,key){
+  if(duel.phase==='private'||duel.phase==='playing'||epoch!==duel.epoch)return;duel.phase='private';duel.peer=id;duel.token=key;duelStatus('Соперник найден · соединяемся напрямую…');
+  const room=duel.room=api.joinRoom(config,'game-'+key),ready=room.makeAction('ready'),moves=room.makeAction('move');
+  const acknowledge=()=>ready.send({ok:true},{target:id}).catch(()=>{});
+  function connected(){if(duel.phase==='playing'||epoch!==duel.epoch)return;cancelSearch();net.side=self<id?'w':'b';net.role='online';const pc=net.pc={close(){}};const dc={readyState:'open',send(text){moves.send(JSON.parse(text),{target:id}).catch(e=>{if(epoch===duel.epoch)netFail('Не удалось отправить ход: '+e.message)})},close(){this.readyState='closed'}};bindChannel(dc,pc);duel.phase='playing';dc.onopen();lobby.leave();duel.lobby=null;clearInterval(duel.timer);duel.timer=null;$('cancelDuel').hidden=true;duelStatus('P2P-дуэль · вы играете '+(net.side==='w'?'белыми':'чёрными'))}
+  ready.onMessage=(data,meta)=>{if(epoch!==duel.epoch||meta.peerId!==id||data?.ok!==true)return;const first=duel.phase!=='playing';connected();if(first)acknowledge()};
+  moves.onMessage=(data,meta)=>{if(epoch===duel.epoch&&meta.peerId===id&&duel.phase==='playing')net.channel?.onmessage?.({data:JSON.stringify(data)})};
+  room.onPeerJoin=peer=>{if(peer===id)acknowledge()};room.onPeerLeave=peer=>{if(epoch===duel.epoch&&peer===id){netFail('Соперник отключился');duelStatus('Соперник отключился. Можно искать новую дуэль.')}};
+  duel.pending={id,key,time:Date.now()};
+ }
+ action.onMessage=(data,meta)=>{
+  if(epoch!==duel.epoch||!data||typeof data!=='object')return;const id=meta.peerId;
+  if(data.type==='free'){peers.set(id,Date.now());return}
+  if(data.type==='offer'&&duel.phase==='search'&&id<self&&typeof data.key==='string'&&/^[a-f0-9]{32}$/.test(data.key)){
+   if(duel.pending&&duel.pending.id!==id)return;duel.pending={id,key:data.key,time:Date.now()};send({type:'accept',key:data.key},id);
+  }else if(data.type==='accept'&&duel.phase==='search'&&duel.pending?.id===id&&duel.pending.key===data.key&&self<id){send({type:'commit',key:data.key},id);privateRoom(id,data.key)}
+  else if(data.type==='commit'&&duel.phase==='search'&&duel.pending?.id===id&&duel.pending.key===data.key)privateRoom(id,data.key);
+ };
+ lobby.onPeerJoin=id=>{peers.set(id,Date.now());send({type:'free'},id)};
+ lobby.onPeerLeave=id=>{peers.delete(id);if(duel.phase==='search'&&duel.pending?.id===id)reset()};
+ duel.timer=setInterval(()=>{
+  if(epoch!==duel.epoch)return;
+  if(duel.phase==='private'){const p=duel.pending;if(Date.now()-p.time>25000){netFail('P2P-соединение не установлено. Попробуйте другую сеть.');duelStatus('Не удалось соединиться напрямую. Попробуйте поиск ещё раз.')}return}
+  if(duel.phase!=='search')return;
+  if(duel.pending){if(Date.now()-duel.pending.time>4500)reset();else return}
+  action.send({type:'free'}).catch(()=>{});
+  const id=[...peers].filter(([id,time])=>id>self&&Date.now()-time<6000).map(([id])=>id).sort()[0];
+  if(id){const bytes=crypto.getRandomValues(new Uint8Array(16)),key=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');duel.pending={id,key,time:Date.now()};send({type:'offer',key},id)}
+ },700);status();
+ }catch(e){if(epoch!==duel.epoch)return;closeNet();duelStatus('Не удалось начать поиск: '+e.message)}
+};
+window.addEventListener('pagehide',closeDuel);
+
+const net={pc:null,channel:null,side:'w',connected:false,role:null,working:false,workEpoch:0};
+function netMessage(text){$('netStatus').textContent=text}
+function closeNet(){closeDuel();net.workEpoch++;stopScanner();$('cameraHelp').hidden=true;$('qrCode').hidden=true;$('qrCaption').textContent='';let pc=net.pc,dc=net.channel;net.pc=null;net.channel=null;net.connected=false;net.role=null;net.working=false;if(dc){dc.onopen=dc.onclose=dc.onmessage=dc.onerror=null;dc.close()}if(pc){pc.onconnectionstatechange=pc.ondatachannel=null;pc.close()}$('connection').setAttribute('aria-busy','false');$('signalPanel').hidden=true;$('disconnect').hidden=true;$('signalIn').value='';$('signalOut').value='';$('createOffer').disabled=false;$('acceptOffer').disabled=false;netMessage('Нет подключения')}
+function netFail(message){closeNet();netMessage(message);if(mode==='rtc')render()}
+function bindChannel(dc,pc){if(net.pc!==pc)return;net.channel=dc;dc.onopen=()=>{if(net.pc!==pc)return;net.connected=true;start('rtc',true);$('signalPanel').hidden=true;$('disconnect').hidden=false;netMessage('Подключено · вы играете '+(net.side==='w'?'белыми':'чёрными'));};dc.onclose=()=>{if(net.pc===pc){net.connected=false;netMessage('Канал закрыт. Создайте приглашение заново.');render()}};dc.onerror=()=>{if(net.pc===pc){net.connected=false;netMessage('Ошибка канала. Создайте подключение заново.');render()}};dc.onmessage=event=>{if(net.pc!==pc||mode!=='rtc')return;try{if(typeof event.data!=='string'||event.data.length>2048)throw Error('Некорректное сообщение');let data=JSON.parse(event.data);if(data.type!=='move'||!data.move||!Number.isInteger(data.ply)||data.ply!==history.length||data.before!==Chess.key(state)||state.turn===net.side||animating||result())throw Error('Позиции не совпадают');let m=data.move;if(!Number.isInteger(m.f)||!Number.isInteger(m.t)||m.f<0||m.f>63||m.t<0||m.t>63||(m.p!==undefined&&!['q','r','b','n'].includes(m.p)))throw Error('Некорректный ход');let legal=Chess.legal(state).find(x=>x.f===m.f&&x.t===m.t&&x.p===m.p);if(!legal)throw Error('Недопустимый ход');play(legal,true)}catch(e){netFail('Партия остановлена: '+e.message+'. Создайте подключение заново.')}}}
+function makePeer(role){if(!window.RTCPeerConnection)throw Error('WebRTC не поддерживается этим браузером');closeNet();cancelSearch();mode='rtc';net.role=role;net.side=role==='host'?'w':'b';let pc=net.pc=new RTCPeerConnection({iceServers:[]});pc.ondatachannel=e=>bindChannel(e.channel,pc);pc.onconnectionstatechange=()=>{if(net.pc!==pc)return;if(pc.connectionState==='disconnected'||pc.connectionState==='failed'){net.connected=false;netMessage('Соединение потеряно. Проверьте Wi-Fi. При необходимости создайте приглашение заново.');render()}else if(pc.connectionState==='connected'&&net.channel?.readyState==='open'){net.connected=true;netMessage('Подключено · вы играете '+(net.side==='w'?'белыми':'чёрными'));render()}};if(role==='host')bindChannel(pc.createDataChannel('chess-v2',{ordered:true}),pc);$('signalPanel').hidden=false;$('disconnect').hidden=false;$('createOffer').disabled=true;$('acceptOffer').disabled=true;$('applySignal').disabled=false;render();return pc}
+async function gather(pc){if(pc.iceGatheringState!=='complete')await new Promise((resolve,reject)=>{let timer=setTimeout(()=>done(Error('Сбор адресов занял слишком много времени. Попробуйте заново.')),12000);function changed(){if(net.pc!==pc||pc.signalingState==='closed')done(Error('Подключение отменено'));else if(pc.iceGatheringState==='complete')done()}function done(e){clearTimeout(timer);pc.removeEventListener('icegatheringstatechange',changed);pc.removeEventListener('signalingstatechange',changed);e?reject(e):resolve()}pc.addEventListener('icegatheringstatechange',changed);pc.addEventListener('signalingstatechange',changed);changed()});if(!/a=candidate:/.test(pc.localDescription?.sdp||''))throw Error('Браузер не предоставил сетевой адрес. Проверьте Wi-Fi и разрешения локальной сети.')}
+async function encodeSignal(pc){let plain=new TextEncoder().encode(pc.localDescription.sdp),compressed=!!window.CompressionStream;let data=compressed?new Uint8Array(await new Response(new Blob([plain]).stream().pipeThrough(new CompressionStream('deflate'))).arrayBuffer()):plain;return 'CH3'+(pc.localDescription.type==='offer'?'O':'A')+(compressed?'D':'R')+btoa(String.fromCharCode(...data)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+async function decodeSignal(text,expected){text=text.trim().replace(/\s/g,'');if(text.length>80000||!/^CH3[OA][DR][A-Za-z0-9_-]+$/.test(text))throw Error('Нужен полный код или QR версии 3');if(text[3]!== (expected==='offer'?'O':'A'))throw Error(expected==='offer'?'Нужен QR приглашения':'Нужен QR ответа друга');let bytes;try{let bin=atob(text.slice(5).replace(/-/g,'+').replace(/_/g,'/'));bytes=Uint8Array.from(bin,c=>c.charCodeAt(0))}catch(e){throw Error('Код повреждён')}let sdp;if(text[4]==='D'){if(!window.DecompressionStream)throw Error('Обновите браузер: нет поддержки распаковки кодов');let reader=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate')).getReader(),chunks=[],length=0;try{while(true){let {value,done}=await reader.read();if(done)break;length+=value.length;if(length>60000){await reader.cancel();throw Error('Код слишком большой')}chunks.push(value)}sdp=await new Blob(chunks).text()}catch(e){throw Error('Код повреждён или слишком большой')}}else sdp=new TextDecoder().decode(bytes);if(sdp.length>60000||!sdp.startsWith('v=0')||!sdp.includes('m=application'))throw Error('Некорректное приглашение');return {type:expected,sdp}}
+function fitQr(){let canvas=$('qrCode'),modules=+canvas.dataset.modules;if(!modules||canvas.hidden)return;let available=Math.min(canvas.parentElement.clientWidth,340);canvas.style.width=(Math.max(1,Math.floor(available/modules))*modules)+'px'}
+window.addEventListener('resize',fitQr);
+async function showSignal(pc){let code=await encodeSignal(pc);if(net.pc!==pc)return;$('signalOut').value=code;try{let qr=qrcode(0,'M');qr.addData(code,'Byte');qr.make();let count=qr.getModuleCount(),scale=6,size=(count+8)*scale,canvas=$('qrCode'),ctx=canvas.getContext('2d');canvas.width=canvas.height=size;ctx.fillStyle='#fff';ctx.fillRect(0,0,size,size);ctx.fillStyle='#000';for(let r=0;r<count;r++)for(let c=0;c<count;c++)if(qr.isDark(r,c))ctx.fillRect((c+4)*scale,(r+4)*scale,scale,scale);canvas.hidden=false;canvas.dataset.modules=count+8;fitQr();$('qrCaption').textContent=(net.role==='host'?'QR приглашения':'QR ответа')+' · '+code.length+' символов';}catch(e){$('qrCode').hidden=true;$('qrCaption').textContent='Код слишком большой для одного QR. Передайте его текстом или файлом.'}}
+let cameraStream=null,scanFrame=0,scanTimer=0,scanEpoch=0,scanPending=false,cameraPromptTimer=0,cameraRequestPending=false;
+function stopScanner(){scanEpoch++;cameraRequestPending=false;cancelAnimationFrame(scanFrame);clearTimeout(scanTimer);clearTimeout(cameraPromptTimer);if(cameraStream)cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;$('qrVideo').srcObject=null;$('qrScanner').hidden=true}
+function readQrCanvas(canvas){let ctx=canvas.getContext('2d',{willReadFrequently:true}),image=ctx.getImageData(0,0,canvas.width,canvas.height);return jsQR(image.data,image.width,image.height,{inversionAttempts:'dontInvert'})?.data}
+async function scannedSignal(code){if(scanPending)return;if(!/^CH3[OA][DR]/.test(code)){netMessage('Это не QR-код приглашения шахмат');return}scanPending=true;stopScanner();$('cameraHelp').hidden=true;$('signalIn').value=code;netMessage('QR распознан. Подключаюсь…');try{await $('applySignal').onclick()}finally{scanPending=false}}
+function showCameraHelp(message){$('cameraHelp').hidden=false;$('cameraProblem').textContent=message}
+function openQrCamera(){if(net.working){netMessage('Дождитесь создания кода подключения.');return}stopScanner();showCameraHelp('После снимка QR будет распознан автоматически. Можно также выбрать готовое изображение через «QR с фото».');netMessage('Снимите QR целиком, без бликов. Откроется системная камера или выбор изображения.');$('qrCamera').value='';$('qrCamera').click()}
+function preferPhotoCapture(){return !window.isSecureContext||!navigator.mediaDevices?.getUserMedia||(/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)&&['file:','content:'].includes(location.protocol))}
+$('scanQr').onclick=()=>{if(net.working){netMessage('Дождитесь создания кода подключения.');return}if(scanPending)return;if(preferPhotoCapture())openQrCamera();else startLiveScanner()};
+$('takeQrPhoto').onclick=openQrCamera;$('liveQrScan').onclick=()=>startLiveScanner();
+async function startLiveScanner(){if(net.working||scanPending)return;if(cameraRequestPending){showCameraHelp('Ожидаю ответа браузера. Если запрос не появился, используйте «Снять QR камерой».');return}stopScanner();let epoch=scanEpoch;if(!navigator.mediaDevices?.getUserMedia||!window.isSecureContext){showCameraHelp('Этот браузер не даёт прямой доступ к камере для данного файла. Нажмите «Снять QR камерой».');netMessage('Прямой доступ к камере недоступен. Используйте системную камеру.');return}cameraRequestPending=true;showCameraHelp('Браузер должен запросить доступ к камере. Если окна нет, можно снять QR системной камерой.');cameraPromptTimer=setTimeout(()=>{if(epoch===scanEpoch&&!cameraStream)showCameraHelp('Запрос камеры не появился или ещё ожидает ответа. Нажмите «Снять QR камерой» либо проверьте разрешение камеры для браузера.')},6000);try{netMessage('Ожидаю разрешение камеры…');let stream;try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:960},height:{ideal:720}},audio:false})}catch(e){if(['OverconstrainedError','NotFoundError'].includes(e.name)&&epoch===scanEpoch)stream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});else throw e}if(epoch!==scanEpoch){stream.getTracks().forEach(t=>t.stop());return}cameraRequestPending=false;clearTimeout(cameraPromptTimer);cameraStream=stream;$('cameraHelp').hidden=true;$('qrScanner').hidden=false;let video=$('qrVideo');video.srcObject=stream;await video.play();if(epoch!==scanEpoch)return;netMessage('Наведите камеру на QR-код другого телефона');let canvas=document.createElement('canvas'),ctx=canvas.getContext('2d',{willReadFrequently:true}),last=0;function tick(time){if(!cameraStream||epoch!==scanEpoch)return;if(time-last>160&&video.readyState>=2&&video.videoWidth&&video.videoHeight){last=time;let scale=Math.min(1,900/video.videoWidth);canvas.width=Math.round(video.videoWidth*scale);canvas.height=Math.round(video.videoHeight*scale);ctx.drawImage(video,0,0,canvas.width,canvas.height);let code=readQrCanvas(canvas);if(code){scannedSignal(code);if(!cameraStream)return}}scanFrame=requestAnimationFrame(tick)}scanFrame=requestAnimationFrame(tick);scanTimer=setTimeout(()=>{stopScanner();showCameraHelp('Сканирование завершено. Можно повторить или снять QR системной камерой.');netMessage('QR пока не найден.')},90000)}catch(e){if(epoch!==scanEpoch)return;stopScanner();let reason=['NotAllowedError','PermissionDeniedError','SecurityError'].includes(e.name)?'Доступ к камере запрещён. Если отказ уже сохранён, браузер не спрашивает снова. Разрешите камеру в настройках браузера или нажмите «Снять QR камерой».':['NotFoundError','DevicesNotFoundError'].includes(e.name)?'Браузер не нашёл камеру. Можно снять QR через системную камеру или выбрать его фото.':['NotReadableError','TrackStartError'].includes(e.name)?'Камера занята или недоступна браузеру. Закройте другие приложения камеры либо используйте снимок QR.':'Не удалось открыть камеру. Нажмите «Снять QR камерой» или выберите «QR с фото».';showCameraHelp(reason);netMessage(reason)}}
+$('stopScan').onclick=stopScanner;
+async function handleQrPhoto(e){let file=e.target.files[0],url;if(!file)return;stopScanner();let epoch=scanEpoch,peer=net.pc;try{if(file.size>20000000)throw Error('Изображение слишком большое');url=URL.createObjectURL(file);let image=new Image();await new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=reject;image.src=url});if(epoch!==scanEpoch||peer!==net.pc)return;let canvas=document.createElement('canvas'),code=null;for(let max of [1600,900,500]){let scale=Math.min(3,max/Math.max(image.width,image.height));canvas.width=Math.round(image.width*scale);canvas.height=Math.round(image.height*scale);canvas.getContext('2d').imageSmoothingEnabled=false;canvas.getContext('2d').drawImage(image,0,0,canvas.width,canvas.height);code=readQrCanvas(canvas);if(code)break}if(!code)throw Error('QR не найден. Снимите код целиком, без бликов и размытия.');await scannedSignal(code)}catch(err){if(epoch===scanEpoch&&peer===net.pc)netMessage(err.message||'Не удалось прочитать изображение')}finally{if(url)URL.revokeObjectURL(url);e.target.value=''}}
+$('qrImage').onchange=handleQrPhoto;$('qrCamera').onchange=handleQrPhoto;
+async function netWork(action,resetOnError=false){if(net.working||animating)return;net.working=true;$('connection').setAttribute('aria-busy','true');let epoch=net.workEpoch;try{let pending=action();epoch=net.workEpoch;await pending}catch(e){if(epoch!==net.workEpoch)return;if(resetOnError)closeNet();netMessage('Ошибка: '+e.message)}finally{if(epoch===net.workEpoch){net.working=false;$('connection').setAttribute('aria-busy','false')}}}
+$('createOffer').onclick=()=>netWork(async()=>{let pc=makePeer('host');net.working=true;$('connection').setAttribute('aria-busy','true');netMessage('Подготавливаю приглашение…');await pc.setLocalDescription(await pc.createOffer());await gather(pc);if(net.pc!==pc)return;await showSignal(pc);$('signalOutLabel').textContent='1. Передайте этот код другу';$('signalInLabel').textContent='2. Вставьте ответ друга';$('applySignal').textContent='Подключиться';netMessage('Отправьте приглашение другу и дождитесь его ответа.');},true);
+$('acceptOffer').onclick=()=>netWork(async()=>{makePeer('guest');$('signalOutLabel').textContent='2. Здесь появится ваш ответ';$('signalInLabel').textContent='1. Вставьте приглашение';$('applySignal').textContent='Создать ответ';netMessage('Вставьте код приглашения с первого устройства.');$('signalIn').focus()});
+$('applySignal').onclick=()=>netWork(async()=>{let pc=net.pc;if(!pc)throw Error('Сначала создайте или примите приглашение');if(net.role==='host'){let answer=await decodeSignal($('signalIn').value,'answer');await pc.setRemoteDescription(answer);if(net.pc!==pc)return;$('applySignal').disabled=true;netMessage('Подключаюсь… Если соединение не появится, проверьте общую Wi-Fi сеть.')}else{let offer=await decodeSignal($('signalIn').value,'offer');await pc.setRemoteDescription(offer);await pc.setLocalDescription(await pc.createAnswer());await gather(pc);if(net.pc!==pc)return;await showSignal(pc);$('applySignal').disabled=true;netMessage('Передайте ответ на первое устройство. Оно завершит подключение.')}});
+$('copySignal').onclick=async()=>{if(!$('signalOut').value){netMessage('Код ещё не создан');return}try{await navigator.clipboard.writeText($('signalOut').value);netMessage('Код скопирован')}catch(e){$('signalOut').focus();$('signalOut').select();netMessage('Код выделен — скопируйте его через меню браузера.')}};
+$('saveSignal').onclick=()=>{if(!$('signalOut').value)return;let url=URL.createObjectURL(new Blob([$('signalOut').value],{type:'text/plain'})),a=document.createElement('a');a.href=url;a.download=net.role==='host'?'chess-invite.txt':'chess-answer.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+$('loadSignal').onchange=async e=>{let file=e.target.files[0];try{if(file){if(file.size>80000)throw Error('Файл слишком большой');$('signalIn').value=await file.text();netMessage('Код загружен. Нажмите кнопку подключения.')}}catch(err){netMessage(err.message)}e.target.value=''};
+$('disconnect').onclick=()=>{netFail('Отключено. Можно начать новую партию или подключиться заново.')};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stopScanner()});
+window.addEventListener('pagehide',()=>{disposeEngine();stopScanner();net.channel?.close();net.pc?.close()});
+$('copyPgn').onclick=()=>{let moves=history.map((s,i)=>(i%2===0?`${Math.floor(i/2)+1}. `:'')+s).join(' ');let text=`[Event "Offline Chess"]\n[Site "Local"]\n[White "${mode==='bot'&&human==='b'?'Aviator':'Player'}"]\n[Black "${mode==='bot'&&human==='w'?'Aviator':'Player'}"]\n[Result "${gameResult}"]\n\n${moves} ${gameResult}\n`;let url=URL.createObjectURL(new Blob([text],{type:'application/x-chess-pgn'})),a=document.createElement('a');a.href=url;a.download='chess-offline.pgn';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+render();
+</script></body></html>
+
+
+
