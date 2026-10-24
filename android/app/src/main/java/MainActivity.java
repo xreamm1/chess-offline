@@ -69,7 +69,7 @@ public final class MainActivity extends BridgeActivity {
             },"game-export").start();
         }
     }
-    @Override public void onPause() { if (web!=null) web.evaluateJavascript("window.__pauseGame?.()",null); super.onPause(); }
+    @Override public void onStop() { if (web!=null) web.evaluateJavascript("window.__pauseGame?.()",null); super.onStop(); }
     @Override public void onResume() { super.onResume(); if (web!=null) web.evaluateJavascript("window.__resumeGame?.()",null); }
     @Override public void onDestroy() { if (web!=null) web.removeJavascriptInterface("AndroidFiles"); super.onDestroy(); }
     WebView gameView() { return web; }
