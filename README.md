@@ -37,6 +37,12 @@ firebase deploy --only firestore:rules,firestore:indexes
 
 После обновления дождитесь активации Service Worker и перезагрузите страницу, если видна старая версия.
 
+## Готовый файл для офлайна
+
+[Скачать автономный chess-offline.html](https://github.com/xreamm1/chess-offline/releases/download/offline-latest/chess-offline.html).
+
+Файл и SHA-256 автоматически обновляются в [офлайн-релизе](https://github.com/xreamm1/chess-offline/releases/tag/offline-latest) после каждого изменения main. Можно повторить сборку вручную: Actions → Offline HTML release → Run workflow. В HTML включены оба шашечных движка, полная SF19, таблицы и лицензии; интернет нужен только онлайн-функциям.
+
 ## Сборка и проверки
 
 ```sh

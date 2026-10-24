@@ -1,7 +1,9 @@
 const fs=require('fs'),zlib=require('zlib'),path=require('path');
 const read=name=>fs.readFileSync(path.join(__dirname,name)),text=name=>read(name).toString('utf8'),b64=data=>data.toString('base64');
 const script=source=>'<script>'+source.replace(/<\/script/gi,'<\\/script')+'</script>\n';
-let html=text('chess-template.html');html=html.replace('</style>',text('features.css')+'</style>');const libs=text('qrcode.js')+'\n'+text('jsqr.js');html=html.replace("<script>\n'use strict';",()=>script(libs)+"<script>\n'use strict';");
+const escapeHtml=value=>value.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const engineLicenses='<details class="licenses"><summary>Marcher RU и Damka — лицензии MIT</summary><p>Marcher: Collin Kees; Damka: Anton Medvedev. Исходники и адаптация: <a href="https://github.com/xreamm1/Marcher-RU">Marcher-RU</a>.</p><pre>'+escapeHtml(text('vendor/marcher-ru/LICENSE')+'\n\n'+text('vendor/damka/LICENSE'))+'</pre></details>';
+let html=text('chess-template.html').replace('<details class="licenses">',engineLicenses+'<details class="licenses">');html=html.replace('</style>',text('features.css')+'</style>');const libs=text('qrcode.js')+'\n'+text('jsqr.js');html=html.replace("<script>\n'use strict';",()=>script(libs)+"<script>\n'use strict';");
 const slices=fs.readdirSync(path.join(__dirname,'vendor/damka/db')).filter(n=>n.endsWith('.bin')).sort().map(n=>read('vendor/damka/db/'+n));let parts=[];for(const slice of slices){const header=Buffer.alloc(4);header.writeUInt32LE(slice.length);parts.push(header,slice)}const tables=zlib.gzipSync(Buffer.concat(parts),{level:9});
 const data=(id,bytes)=>'<script id="'+id+'" type="application/octet-stream">'+b64(bytes)+'</script>\n';
 const small=data('sfJs',read('stockfish19.js'))+data('sfLiteJs',read('stockfish19-lite.js'))+data('sfLiteWasm',read('stockfish19-lite.wasm.gz'))+data('draughtsTables',tables)+data('marcherWasm',read('vendor/marcher-ru/marcher-scalar.wasm'))+data('draughtsWorker',Buffer.from(text('vendor/marcher-ru/marcher-scalar.js')+'\n'+text('damka-worker.js')));

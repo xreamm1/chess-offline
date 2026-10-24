@@ -1,0 +1,58 @@
+name: Offline HTML release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: offline-html-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build draughts engines from source
+        run: |
+          npx --yes esbuild@0.25.11 damka-rules-entry.ts --bundle --format=iife --global-name=DamkaRules --minify --outfile=damka-rules.js
+          npx --yes esbuild@0.25.11 damka-worker-entry.ts --bundle --format=iife --minify --outfile=damka-worker.js
+      - name: Verify rules and build standalone HTML
+        run: |
+          node test-rules.cjs
+          node build-offline.cjs
+          test -s chess-offline.html
+          sha256sum chess-offline.html > chess-offline.sha256
+      - name: Prepare release notes
+        run: |
+          cat > "$RUNNER_TEMP/offline-release.md" <<'NOTES'
+          # Автономная версия игры
+
+          Скачайте **chess-offline.html**, сохраните на устройстве и откройте браузером.
+          В файл встроены шахматы, русские шашки, полная Stockfish 19, Marcher RU, Damka и шашечные эндшпильные таблицы.
+          Для локальной игры и анализа интернет не требуется. Друзья, чат и онлайн-дуэли используют интернет.
+
+          Файл обновляется автоматически после изменений в main.
+          Контрольная сумма находится в chess-offline.sha256.
+          NOTES
+          printf '\nИсходный коммит: `%s`\n' "$GITHUB_SHA" >> "$RUNNER_TEMP/offline-release.md"
+      - name: Publish latest offline file
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=offline-latest
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/git/refs/tags/$tag" -f sha="$GITHUB_SHA" -F force=true
+            gh release upload "$tag" chess-offline.html chess-offline.sha256 --clobber
+            gh release edit "$tag" --title 'Офлайн-версия — актуальная сборка' --notes-file "$RUNNER_TEMP/offline-release.md" --latest
+          else
+            gh release create "$tag" chess-offline.html chess-offline.sha256 --target "$GITHUB_SHA" --title 'Офлайн-версия — актуальная сборка' --notes-file "$RUNNER_TEMP/offline-release.md" --latest
+          fi
