@@ -1,0 +1,55 @@
+rules_version = '2';
+service cloud.firestore {
+ match /databases/{database}/documents {
+  function signed(){return request.auth != null;}
+  function uid(){return request.auth.uid;}
+  function game(id){return get(/databases/$(database)/documents/games/$(id)).data;}
+  function member(id){return signed() && uid() in game(id).members;}
+  function validName(n){return n is string && n.size() >= 1 && n.size() <= 24;}
+  function validGame(g){return g in ['chess','checkers-en','checkers-ru'];}
+  match /players/{player} {
+   allow read: if signed();
+   allow create: if signed() && player == uid() && request.resource.data.keys().hasOnly(['name','updatedAt']) && validName(request.resource.data.name) && request.resource.data.updatedAt == request.time;
+   allow update: if signed() && player == uid() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name','updatedAt','lastChatAt']) && validName(request.resource.data.name) && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['lastChatAt']) || request.resource.data.lastChatAt == request.time);
+  }
+  match /friendships/{id} {
+   allow get: if signed() && (!exists(/databases/$(database)/documents/friendships/$(id)) || uid() in resource.data.members);
+   allow list: if signed() && uid() in resource.data.members;
+   allow create: if signed() && request.resource.data.keys().hasOnly(['members','sender','recipient','names','status','createdAt']) && request.resource.data.sender == uid() && request.resource.data.members == [uid(),request.resource.data.recipient] && request.resource.data.recipient != uid() && exists(/databases/$(database)/documents/players/$(request.resource.data.recipient)) && request.resource.data.status == 'pending' && request.resource.data.createdAt == request.time && request.resource.data.names is map && request.resource.data.names.keys().hasOnly(request.resource.data.members) && validName(request.resource.data.names[uid()]) && validName(request.resource.data.names[request.resource.data.recipient]);
+   allow update: if signed() && resource.data.recipient == uid() && resource.data.status == 'pending' && request.resource.data.status == 'accepted' && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+   allow delete: if signed() && uid() in resource.data.members;
+  }
+  match /queue/{player} {
+   allow read: if signed();
+   allow create: if signed() && player == uid() && request.resource.data.keys().hasOnly(['uid','game','name','status','session','gameId','updatedAt']) && request.resource.data.uid == uid() && validGame(request.resource.data.game) && validName(request.resource.data.name) && request.resource.data.status == 'waiting' && request.resource.data.gameId == null && request.resource.data.session is string && request.resource.data.session.size() <= 64 && request.resource.data.updatedAt == request.time;
+   allow update: if signed() && (
+    (player == uid() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['updatedAt']) && request.resource.data.updatedAt == request.time)
+    || (resource.data.status == 'waiting' && request.resource.data.status == 'matched' && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','gameId']) && getAfter(/databases/$(database)/documents/games/$(request.resource.data.gameId)).data.kind == 'match' && player in getAfter(/databases/$(database)/documents/games/$(request.resource.data.gameId)).data.members && uid() in getAfter(/databases/$(database)/documents/games/$(request.resource.data.gameId)).data.members && getAfter(/databases/$(database)/documents/games/$(request.resource.data.gameId)).data.createdAt == request.time)
+   );
+   allow delete: if signed() && player == uid();
+  }
+  match /games/{id} {
+   function old(){return resource.data;}
+   function next(){return request.resource.data;}
+   function queueMatches(player){return get(/databases/$(database)/documents/queue/$(player)).data.status == 'waiting' && get(/databases/$(database)/documents/queue/$(player)).data.game == next().game && get(/databases/$(database)/documents/queue/$(player)).data.updatedAt > request.time - duration.value(60,'s') && getAfter(/databases/$(database)/documents/queue/$(player)).data.status == 'matched' && getAfter(/databases/$(database)/documents/queue/$(player)).data.gameId == id;}
+   allow read: if signed() && uid() in old().members;
+   allow create: if signed() && next().keys().hasOnly(['game','members','names','white','black','turn','ply','lastMove','status','kind','friendship','inviter','createdAt','updatedAt']) && validGame(next().game) && next().members is list && next().members.size() == 2 && next().members[0] != next().members[1] && uid() in next().members && next().white in next().members && next().black in next().members && next().white != next().black && next().turn == (next().game == 'checkers-en' ? next().black : next().white) && next().ply == 0 && next().lastMove == null && next().inviter == uid() && next().createdAt == request.time && next().updatedAt == request.time && next().names is map && next().names.keys().hasOnly(next().members) && validName(next().names[next().white]) && validName(next().names[next().black]) && (
+    (next().kind == 'match' && next().status == 'active' && next().friendship == null && queueMatches(next().white) && queueMatches(next().black)) ||
+    (next().kind == 'invite' && next().status == 'invited' && get(/databases/$(database)/documents/friendships/$(next().friendship)).data.status == 'accepted' && uid() in get(/databases/$(database)/documents/friendships/$(next().friendship)).data.members && next().white in get(/databases/$(database)/documents/friendships/$(next().friendship)).data.members && next().black in get(/databases/$(database)/documents/friendships/$(next().friendship)).data.members)
+   );
+   allow update: if signed() && uid() in old().members && next().updatedAt == request.time && (
+    (old().status == 'invited' && uid() != old().inviter && next().status in ['active','declined'] && next().diff(old()).affectedKeys().hasOnly(['status','updatedAt'])) ||
+    (old().status in ['active','invited'] && next().status == 'left' && next().diff(old()).affectedKeys().hasOnly(['status','updatedAt'])) ||
+    (old().status == 'active' && old().turn == uid() && next().diff(old()).affectedKeys().hasOnly(['ply','turn','lastMove','updatedAt']) && next().ply == old().ply + 1 && next().turn == (old().turn == old().white ? old().black : old().white) && next().lastMove is string && next().lastMove.size() <= 2048 && getAfter(/databases/$(database)/documents/games/$(id)/moves/$(string(next().ply))).data.payload == next().lastMove)
+   );
+   match /moves/{move} {
+    allow read: if member(id);
+    allow create: if member(id) && move == string(request.resource.data.ply) && request.resource.data.keys().hasOnly(['ply','sender','payload','createdAt']) && request.resource.data.sender == uid() && game(id).status == 'active' && game(id).turn == uid() && request.resource.data.ply == game(id).ply + 1 && request.resource.data.createdAt == request.time && request.resource.data.payload is string && request.resource.data.payload.size() <= 2048 && getAfter(/databases/$(database)/documents/games/$(id)).data.ply == request.resource.data.ply && getAfter(/databases/$(database)/documents/games/$(id)).data.lastMove == request.resource.data.payload;
+   }
+   match /chat/{message} {
+    allow read: if member(id);
+    allow create: if member(id) && game(id).status == 'active' && request.resource.data.keys().hasOnly(['sender','name','text','createdAt']) && request.resource.data.sender == uid() && validName(request.resource.data.name) && request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 300 && request.resource.data.createdAt == request.time && getAfter(/databases/$(database)/documents/players/$(uid())).data.lastChatAt == request.time && (!('lastChatAt' in get(/databases/$(database)/documents/players/$(uid())).data) || request.time >= get(/databases/$(database)/documents/players/$(uid())).data.lastChatAt + duration.value(1,'s'));
+   }
+  }
+ }
+}

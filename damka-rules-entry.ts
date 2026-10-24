@@ -1,0 +1,13 @@
+import {initialPosition,squareName,squareFromName} from './vendor/damka/src/game/board.ts';
+import {applyMove} from './vendor/damka/src/game/apply.ts';
+import {toBitPosition,fromBitPosition,detailedOf} from './vendor/damka/src/engine/adapter.ts';
+import {generateDetailed} from './vendor/damka/src/engine/movegen.ts';
+import {status} from './vendor/damka/src/engine/status.ts';
+import {parsePos} from './vendor/damka/src/engine/position.ts';
+import {CHECKERS} from './vendor/damka/src/engine/variant.ts';
+export const initial=()=>initialPosition('checkers');
+export const legal=p=>generateDetailed(toBitPosition(p));
+export const apply=applyMove;
+export const outcome=p=>{const b=toBitPosition(p);return status(b.white,b.black,b.kings,b.side,b.plies,CHECKERS)};
+export const key=p=>{const b=toBitPosition(p);return [b.white,b.black,b.kings,b.side].join(':')};
+export {squareName,squareFromName,toBitPosition,fromBitPosition,detailedOf,parsePos};

@@ -1,3 +1,8 @@
 chess-offline.html
 stockfish19.wasm
 stockfish19-lite.wasm
+
+*-debug.log
+ui-debug.log
+.firebase/
+node_modules/
