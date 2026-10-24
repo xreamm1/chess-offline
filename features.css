@@ -2,3 +2,5 @@ input[type=text],input[type=url],textarea{font:inherit;background:#30302b;color:
 .engine-variants{display:grid;gap:7px;margin-top:12px;font:12px ui-monospace,monospace;color:#c2cbb4;overflow-wrap:anywhere}.engine-variants>div{padding:7px;background:#ffffff05;border-radius:3px}
 
 .draughts-outcome{border-left:3px solid #94af75;padding:12px;margin:14px 0;background:#ffffff05}.draughts-outcome strong{font-size:15px}.draughts-outcome p{margin:5px 0 0;font-size:12px}.draughts-outcome[data-kind=interrupted],.draughts-outcome[data-kind=error]{border-color:#c6a469}
+
+.engine-selection-badge{display:flex;align-items:center;min-height:34px;margin:8px 0 12px;padding:7px 10px;border-radius:7px;background:#34402c;color:#cfe5b4;font-size:12px;font-weight:650;letter-spacing:.01em}.engine-selection-badge[data-engine=lite]{background:#473d2b;color:#f0cc7a}.engine-selection-badge[data-engine=error]{background:#482e2d;color:#ffaaa1}
