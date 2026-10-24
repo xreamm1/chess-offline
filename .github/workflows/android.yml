@@ -69,7 +69,7 @@ jobs:
           if gh release view android-latest >/dev/null 2>&1; then
             gh api --method PATCH "repos/$GITHUB_REPOSITORY/git/refs/tags/android-latest" -f sha="$GITHUB_SHA" -F force=true
             gh release upload android-latest chess-offline-android.apk chess-offline-android.sha256 --clobber
-            gh release edit android-latest --title 'Android — тестовая офлайн-сборка' --notes-file "$RUNNER_TEMP/android-release.md" --prerelease --latest=false
+            gh release edit android-latest --title 'Android — тестовая офлайн-сборка' --notes-file "$RUNNER_TEMP/android-release.md"
           else
-            gh release create android-latest chess-offline-android.apk chess-offline-android.sha256 --target "$GITHUB_SHA" --title 'Android — тестовая офлайн-сборка' --notes-file "$RUNNER_TEMP/android-release.md" --prerelease --latest=false
+            gh release create android-latest chess-offline-android.apk chess-offline-android.sha256 --target "$GITHUB_SHA" --title 'Android — тестовая офлайн-сборка' --notes-file "$RUNNER_TEMP/android-release.md"
           fi
