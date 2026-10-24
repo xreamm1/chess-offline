@@ -103,12 +103,6 @@ export function evaluate(
   if (blackMen !== 0) score += popcount(whiteMen & RANK_1) * BACK_RANK_GUARD
   if (whiteMen !== 0) score -= popcount(blackMen & RANK_1) * BACK_RANK_GUARD
   const classical = (side === WHITE ? score : -score) + TEMPO
-  // Russian adapter: use the upstream English-trained NNUE only as a bounded positional term.
-  const nnue = (globalThis as any).__marcherRussianEval
-  if (typeof nnue === 'function') {
-    const neural = nnue(white, black, kings, side)
-    return Math.max(-EVAL_MAX + 1, Math.min(EVAL_MAX - 1, classical + Math.max(-100, Math.min(100, Math.trunc(neural / 8)))))
-  }
   return classical
 }
 

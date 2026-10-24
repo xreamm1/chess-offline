@@ -31,11 +31,11 @@ self.onmessage=async event=>{
    if(engine==='marcher-ru')await loadMarcher();
    // Different evaluations cannot share cached scores or move bounds.
    if(lastEngine!==engine){ttClear();lastEngine=engine}
-   (globalThis as any).__marcherRussianEval=engine==='marcher-ru'?neural:null;neuralCalls=0;
+   (globalThis as any).__marcherOrdering=engine==='marcher-ru'?neural:null;neuralCalls=0;
    const p=data.position,started=performance.now(),before=dbStats();
-   const metrics=()=>{const stats=searchStats(),db=dbStats();return {time:performance.now()-started,neuralCalls,ttProbes:stats.ttProbes,ttHits:stats.ttHits,hashBytes:ttEntries()*32,dbProbes:db.probes-before.probes,dbInflates:db.inflates-before.inflates,dbCacheBytes:db.cachedBytes}};
+   const metrics=()=>{const stats=searchStats(),db=dbStats();return {time:performance.now()-started,neuralCalls,reductions:stats.reductions,researches:stats.researches,ttProbes:stats.ttProbes,ttHits:stats.ttHits,hashBytes:ttEntries()*32,dbProbes:db.probes-before.probes,dbInflates:db.inflates-before.inflates,dbCacheBytes:db.cachedBytes}};
    (globalThis as any).__damkaIteration=(info:any)=>self.postMessage({type:'progress',id:data.id,engine,...info,...metrics(),variants:variants(p,info.root),pv:info.root.length?continuation(p,info.root[0],info.root[1]):[]});
-   const result=search(p.white,p.black,p.kings,p.side,p.plies,{variant:CHECKERS,depth:Math.max(1,Math.min(40,data.depth??24)),budgetMs:Math.max(0,Math.min(5000,data.budget??800)),margin:0});
+   const result=search(p.white,p.black,p.kings,p.side,p.plies,{variant:CHECKERS,depth:Math.max(1,Math.min(40,data.depth??24)),budgetMs:Math.max(0,Math.min(5000,data.budget??800)),margin:0,russian:engine==='marcher-ru'});
    (globalThis as any).__damkaIteration=null;self.postMessage({type:'result',id:data.id,engine,...metrics(),variants:variants(p,result.root),pv:continuation(p,result.m0,result.m1),move:detailedOf(p,result.m0,result.m1),depth:result.depth,score:result.score,nodes:result.nodes,pieces:dbPieces()});
   }
  }catch(e){self.postMessage({type:'error',id:data.id,message:e.message})}

@@ -4,8 +4,8 @@ This is a Russian-rules adapter around Marcher NNUE, not the unmodified English-
 
 - Upstream Marcher: https://github.com/Stermere/Checkers-Engine , MIT. `marcher-scalar.js` and `.wasm` are the engine-latest release built from upstream commit `1fa785e`.
 - Russian move generation, complete capture paths, promotion during captures, alpha-beta/PVS search and up-to-five-piece endgame tables: Damka by Anton Medvedev, MIT, under `../damka/`.
-- The integration source is `../../damka-worker-entry.ts`; `../damka/src/engine/eval.ts` adds the adapter hook.
-- Marcher's exported `_wasm_nnue_eval` runs on transformed Russian positions. The English-trained NNUE contributes a bounded positional correction (at most one man), while Russian flying-king material values and exact Russian endgame tables take precedence.
+- The integration source is `../../damka-worker-entry.ts`; `../damka/src/engine/search.ts` adds verified late-move reductions and forced-capture extensions.
+- Marcher's exported `_wasm_nnue_eval` orders root moves only. Leaves use the Russian classical evaluation and exact Russian endgame tables. There are no per-leaf JS/WASM calls or BigInt board conversions. The English-trained network cannot alter Russian evaluation scores.
 - The upstream English move generator, forced-jump search, opening book and English endgame tables are **not** used: their rules are incompatible with Russian draughts.
 - A single Worker performs the search. Time budgets and maximum depth are capped. No external calls are needed after the page is cached.
 

@@ -96,6 +96,8 @@ export type Limits = {
   readonly budgetMs: number
   /** Root moves within this many points of the best get exact scores. */
   readonly margin: number
+  /** Russian search extensions, root NNUE ordering and late quiet-move reductions. */
+  readonly russian?: boolean
 }
 
 export type SearchResult = {
@@ -115,6 +117,8 @@ export type SearchStats = {
   readonly nodes: number
   readonly ttProbes: number
   readonly ttHits: number
+  readonly reductions: number
+  readonly researches: number
 }
 
 export const ROOT_SLOTS = 4
@@ -150,9 +154,12 @@ const DONE_BOUND = new Int32Array(MAX_MOVES)
 
 /** The variant of the search in progress; set by `search`, read by the tree. */
 let variant: Variant = CHECKERS
+let russian = false
 let nodes = 0
 let ttProbes = 0
 let ttHits = 0
+let reductions = 0
+let researches = 0
 let aborted = false
 let canAbort = false
 let deadline = 0
@@ -164,7 +171,7 @@ let newScore = 0
 
 /** Counters of the last `search` call. */
 export function searchStats(): SearchStats {
-  return { nodes, ttProbes, ttHits }
+  return { nodes, ttProbes, ttHits, reductions, researches }
 }
 
 export function search(
@@ -176,9 +183,12 @@ export function search(
   limits: Limits,
 ): SearchResult {
   variant = limits.variant
+  russian = limits.russian === true && variant === CHECKERS
   nodes = 0
   ttProbes = 0
   ttHits = 0
+  reductions = 0
+  researches = 0
   aborted = false
   canAbort = false
   hasNew = false
@@ -197,6 +207,16 @@ export function search(
     return { m0: 0, m1: 0, score, depth: 0, nodes, root }
   }
   for (let i = 0; i < count; i++) ROOT_IDX[i] = i
+  // The English-trained network orders root moves only; it cannot change Russian leaf scores.
+  const neuralOrder = (globalThis as any).__marcherOrdering
+  if (russian && count > 1 && typeof neuralOrder === 'function') {
+    for (let i = 0; i < count; i++) {
+      const at = i * MOVE_SLOTS
+      makeMove(white, black, kings, side, plies, STACK[at]!, STACK[at + 1]!)
+      ROOT_SCORE[i] = 0 - neuralOrder(APPLIED[0], APPLIED[1], APPLIED[2], side ^ 1)
+    }
+    sortRoot(count)
+  }
   PATH[0] = white
   PATH[1] = black
   PATH[2] = kings
@@ -481,7 +501,7 @@ function negamax(
   PATH[here] = white
   PATH[here + 1] = black
   PATH[here + 2] = kings
-  const childDepth = count === 1 && !captures ? depth : depth - 1
+  const childDepth = count === 1 && (!captures || russian) ? depth : depth - 1
   orderMoves(base, count, ply, captures, kings, ttM0, ttM1)
 
   const origAlpha = alpha
@@ -504,9 +524,19 @@ function negamax(
       score =
         0 - negamax(w, b, kk, side ^ 1, p, childDepth, ply + 1, -beta, -alpha)
     } else {
+      // Never reduce captures, promotions, forced moves, killers or the first move.
+      const reduce = russian && !captures && depth >= 3 && i >= 3 &&
+        !movePromotes(m0) &&
+        ORDER[orderBase + i]! < ORDER_KILLER
+      const reduction = reduce ? (depth >= 7 && i >= 8 ? 2 : 1) : 0
+      if (reduction) reductions++
       score =
         0 -
-        negamax(w, b, kk, side ^ 1, p, childDepth, ply + 1, -alpha - 1, -alpha)
+        negamax(w, b, kk, side ^ 1, p, childDepth - reduction, ply + 1, -alpha - 1, -alpha)
+      if (!aborted && reduction && score > alpha) {
+        researches++
+        score = 0 - negamax(w, b, kk, side ^ 1, p, childDepth, ply + 1, -alpha - 1, -alpha)
+      }
       if (!aborted && score > alpha && score < beta) {
         score =
           0 - negamax(w, b, kk, side ^ 1, p, childDepth, ply + 1, -beta, -alpha)
