@@ -61,6 +61,8 @@ let detailed: DetailedMove[] | null = null
  * (two slots per move) and returns the number of moves. Captures are
  * mandatory, so the list is either all captures or all quiet moves:
  * `out[base + 1] !== 0` tells which.
+ * Capture-only leaf mode returns -1 for a quiet playable position, without
+ * writing its unused quiet moves; 0 still means no legal move.
  *
  * Not reentrant: the search state lives in module-level scratch, so never
  * call `generate` or `generateDetailed` from inside another call.
@@ -72,10 +74,8 @@ export function generate(
   side: number,
   target: Int32Array,
   base: number,
+  captureOnly = false,
 ): number {
-  out = target
-  S[CURSOR] = base
-  S[BASE] = base
   const own = side === WHITE ? white : black
   const enemy = side === WHITE ? black : white
   const promotion = side === WHITE ? RANK_8 : RANK_1
@@ -83,8 +83,6 @@ export function generate(
   const empty = ~occupied
   const men = own & ~kings
   const ownKings = own & kings
-  S[ENEMY] = enemy
-  S[PROMOTION] = promotion
 
   // Men that can capture: walk two steps back from every empty square.
   let candidates =
@@ -93,6 +91,15 @@ export function generate(
       upRight(upRight(empty) & enemy) |
       upLeft(upLeft(empty) & enemy)) &
     men
+  if (captureOnly && ownKings === 0 && candidates === 0) {
+    const targets = side === WHITE ? upLeft(men) | upRight(men) : downLeft(men) | downRight(men)
+    return (targets & empty) !== 0 ? -1 : 0
+  }
+  out = target
+  S[CURSOR] = base
+  S[BASE] = base
+  S[ENEMY] = enemy
+  S[PROMOTION] = promotion
   for (; candidates !== 0; candidates &= candidates - 1) {
     const sq = lsb(candidates)
     S[ORIGIN] = sq
@@ -106,6 +113,15 @@ export function generate(
     kingCaptures(sq, 0, 0, 0)
   }
   if (S[CURSOR] !== base) return (S[CURSOR] - base) >> 1
+
+  if (captureOnly) {
+    const manTargets = side === WHITE
+      ? (upLeft(men) | upRight(men)) & empty
+      : (downLeft(men) | downRight(men)) & empty
+    const kingTargets = (upLeft(ownKings) | upRight(ownKings) |
+      downLeft(ownKings) | downRight(ownKings)) & empty
+    return (manTargets | kingTargets) !== 0 ? -1 : 0
+  }
 
   // Quiet men moves, one direction at a time; the origin is one step back.
   if (side === WHITE) {

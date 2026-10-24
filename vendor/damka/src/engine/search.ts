@@ -54,7 +54,7 @@
 import { APPLIED, makeMove } from './apply.ts'
 import { popcount } from './bitboard.ts'
 import { DB_DRAW_BAND, DB_UNKNOWN, dbPieces, dbProbe } from './db.ts'
-import { evaluate } from './eval.ts'
+import { evaluate, evaluateMen } from './eval.ts'
 import { evaluateGiveaway } from './evalGiveaway.ts'
 import { moveCaptureCount, movePromotes } from './move.ts'
 import { MAX_MOVES, MOVE_SLOTS, generate } from './movegen.ts'
@@ -439,7 +439,7 @@ function negamax(
   if (aborted) return 0
   if (ply >= MAX_PLY) return evalOf(white, black, kings, side)
   const base = ply * REGION
-  const count = generate(white, black, kings, side, STACK, base)
+  const count = generate(white, black, kings, side, STACK, base, russian && depth <= 0)
   if (count === 0) return noMoveScore(ply)
   if (statusOf(count, side, plies, variant) === DRAW) return DRAW_SCORE
   for (let k = ply - 2; k >= 0 && k >= ply - plies; k -= 2) {
@@ -452,7 +452,7 @@ function negamax(
       return DRAW_SCORE
     }
   }
-  const captures = STACK[base + 1] !== 0
+  const captures = count > 0 && STACK[base + 1] !== 0
   // The endgame database holds the exact value of the position, so the
   // node ends here. Never with a capture on the board: captures are
   // mandatory, and the generator leaves those entries as don't-care.
@@ -595,7 +595,7 @@ function evalOf(
 ): number {
   return variant === GIVEAWAY
     ? evaluateGiveaway(white, black, kings, side)
-    : evaluate(white, black, kings, side)
+    : russian && kings === 0 ? evaluateMen(white, black, side) : evaluate(white, black, kings, side)
 }
 
 /**

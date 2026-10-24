@@ -106,6 +106,16 @@ export function evaluate(
   return classical
 }
 
+/** Exact same evaluation when no kings exist, without zero king lookups. */
+export function evaluateMen(white: number, black: number, side: number): number {
+  const mirrored = reverse32(black)
+  let score = MAN_LO[white & 0xffff]! + MAN_HI[white >>> 16]! -
+    MAN_LO[mirrored & 0xffff]! - MAN_HI[mirrored >>> 16]!
+  if (black !== 0) score += popcount(white & RANK_1) * BACK_RANK_GUARD
+  if (white !== 0) score -= popcount(mirrored & RANK_1) * BACK_RANK_GUARD
+  return (side === WHITE ? score : -score) + TEMPO
+}
+
 /** Sum of `table` over the set bits of `b`; the slow reference for the lookups. */
 export function pieceSquareSum(b: number, table: Int32Array): number {
   let sum = 0
