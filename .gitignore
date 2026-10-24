@@ -6,3 +6,12 @@ stockfish19-lite.wasm
 ui-debug.log
 .firebase/
 node_modules/
+android-web/
+android/.gradle/
+android/build/
+android/local.properties
+android/app/build/
+android/app/src/main/assets/
+android/capacitor-cordova-android-plugins/
+*.p12
+*.keystore

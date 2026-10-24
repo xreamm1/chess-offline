@@ -1,0 +1,37 @@
+plugins { id 'com.android.application' }
+def webVersion = new groovy.json.JsonSlurper().parse(file('src/main/assets/public/app-version.json')).version
+android {
+    namespace 'io.github.xreamm1.chessoffline'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'io.github.xreamm1.chessoffline'
+        minSdk 26
+        targetSdk 35
+        versionCode (project.findProperty('appVersionCode') ?: '1').toInteger()
+        versionName webVersion
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+    }
+    signingConfigs {
+        release {
+            if (System.getenv('ANDROID_KEYSTORE_PATH')) {
+                storeFile file(System.getenv('ANDROID_KEYSTORE_PATH'))
+                storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+                keyAlias 'chess-offline'
+                keyPassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+                storeType 'PKCS12'
+            }
+        }
+    }
+    buildTypes { release { signingConfig signingConfigs.release; minifyEnabled false } }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_21; targetCompatibility JavaVersion.VERSION_21 }
+    androidResources { noCompress += ['gz', 'wasm'] }
+}
+dependencies {
+    implementation project(':capacitor-android')
+    implementation project(':capacitor-cordova-android-plugins')
+    implementation 'androidx.webkit:webkit:1.12.1'
+    androidTestImplementation 'androidx.test:runner:1.6.2'
+    androidTestImplementation 'androidx.test:core:1.6.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+}
+apply from: 'capacitor.build.gradle'

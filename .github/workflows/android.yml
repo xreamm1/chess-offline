@@ -1,0 +1,75 @@
+name: Android offline APK
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: android-offline-release
+  cancel-in-progress: true
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Prepare bundled game
+        run: |
+          npm ci --no-audit --no-fund
+          npm run android:prepare
+      - name: Build test APK
+        run: gradle -p android assembleDebug assembleDebugAndroidTest lintDebug -PappVersionCode=${{ github.run_number }} --stacktrace
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Check first launch and both engines offline
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          profile: pixel_6
+          ram-size: 3072M
+          heap-size: 512M
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back emulated
+          script: |
+            adb shell svc wifi disable
+            adb shell svc data disable
+            gradle -p android connectedDebugAndroidTest --stacktrace
+            adb pull /sdcard/Android/data/io.github.xreamm1.chessoffline/files/offline-test.png android/offline-test.png
+      - name: Save diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-reports
+          path: |
+            android/app/build/reports/
+            android/offline-test.png
+      - name: Publish APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk chess-offline-android.apk
+          sha256sum chess-offline-android.apk > chess-offline-android.sha256
+          printf '%s\n' 'Тестовый APK · Android 8+ · Capacitor · https://localhost.' 'В APK встроены полная SF19, Lite, Marcher RU, Damka и базы. Локальная игра и анализ работают без сети с первого запуска. Друзья, чат и онлайн требуют интернет.' 'Проверено в Android-эмуляторе без Wi-Fi и мобильных данных. На физических Huawei/Realme ещё не проверено.' 'Сборка подписана временным debug-ключом. При смене ключа следующее обновление требует удаления старой версии. Постоянная подпись ожидает решения владельца.' "Исходный коммит: $GITHUB_SHA" > "$RUNNER_TEMP/android-release.md"
+          if gh release view android-latest >/dev/null 2>&1; then
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/git/refs/tags/android-latest" -f sha="$GITHUB_SHA" -F force=true
+            gh release upload android-latest chess-offline-android.apk chess-offline-android.sha256 --clobber
+            gh release edit android-latest --title 'Android — тестовая офлайн-сборка' --notes-file "$RUNNER_TEMP/android-release.md" --prerelease --latest=false
+          else
+            gh release create android-latest chess-offline-android.apk chess-offline-android.sha256 --target "$GITHUB_SHA" --title 'Android — тестовая офлайн-сборка' --notes-file "$RUNNER_TEMP/android-release.md" --prerelease --latest=false
+          fi

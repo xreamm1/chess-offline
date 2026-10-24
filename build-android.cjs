@@ -1,0 +1,13 @@
+const fs=require('fs'),path=require('path'),assert=require('assert');
+const root=__dirname,out=path.join(root,'android-web');fs.mkdirSync(out,{recursive:true});
+let html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+assert(html.includes('async function pageWasmResponse()'),'Build index.html first');
+html=html.replace(/^async function pageWasmResponse\(\).*$/m,"async function pageWasmResponse(){const r=await fetch('stockfish19.wasm.gz');if(!r.ok)throw Error('Встроенный Stockfish недоступен: '+r.status);return r;}");
+html=html.replace(/<script>if\('serviceWorker' in navigator[\s\S]*?<\/script>\n/,'');
+html=html.replace('<head>','<head><meta http-equiv="Content-Security-Policy" content="frame-src \'none\'; object-src \'none\'; base-uri \'none\'">');
+const version=html.match(/id="version"[^>]*>v([\d.]+)/)?.[1];assert(version,'Missing game version');
+html=html.replace('</body>',fs.readFileSync(path.join(root,'android/android-bridge.js'),'utf8').replace(/^/,'<script>')+'</script></body>');
+fs.writeFileSync(path.join(out,'index.html'),html);fs.copyFileSync(path.join(root,'stockfish19.wasm.gz'),path.join(out,'stockfish19.wasm.gz'));
+fs.writeFileSync(path.join(out,'app-version.json'),JSON.stringify({version}));
+assert(!html.includes('navigator.serviceWorker.ready'),'Android must not wait for a service worker');
+console.log('Android assets:',version,Buffer.byteLength(html),'HTML bytes +',fs.statSync(path.join(out,'stockfish19.wasm.gz')).size,'bundled SF19 bytes');

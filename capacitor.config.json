@@ -1,0 +1,7 @@
+{
+  "appId": "io.github.xreamm1.chessoffline",
+  "appName": "Шахматы и шашки",
+  "webDir": "android-web",
+  "server": { "hostname": "localhost", "androidScheme": "https", "cleartext": false },
+  "android": { "backgroundColor": "#242421", "allowMixedContent": false, "webContentsDebuggingEnabled": false }
+}
