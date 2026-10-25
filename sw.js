@@ -1,4 +1,4 @@
-const CACHE='chess-offline-v4.2.1-pages-2';
+const CACHE='chess-offline-v4.2.1-pages-3';
 const engineFiles=['stockfish19.wasm.gz','stockfish19-generic.wasm.gz'];
 const allowed=new Set(['index.html',...engineFiles]);
 self.addEventListener('install',event=>event.waitUntil((async()=>{const cache=await caches.open(CACHE);await cache.add(new Request('./index.html',{cache:'reload'}));
