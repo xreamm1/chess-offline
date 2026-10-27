@@ -1,5 +1,9 @@
 package io.github.xreamm1.chessoffline;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
@@ -16,6 +20,7 @@ public final class MainActivity extends BridgeActivity {
     private static final int SAVE_FILE=8912;
     private WebView web;
     private byte[] exportBytes;
+    private ConnectivityManager.NetworkCallback localWifiCallback;
     private boolean trusted(Uri uri) { return uri!=null && "https".equals(uri.getScheme()) && "localhost".equals(uri.getHost()) && (uri.getPort()==-1 || uri.getPort()==443); }
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -34,8 +39,35 @@ public final class MainActivity extends BridgeActivity {
             }
         });
         web.addJavascriptInterface(new FileExport(),"AndroidFiles");
+        web.addJavascriptInterface(new LocalNetwork(),"AndroidLocalNetwork");
     }
     private void message(String text) { Toast.makeText(this,text,Toast.LENGTH_LONG).show(); }
+    // Without this, Android won't route WebView traffic over a Wi-Fi network it considers "no internet",
+    // so WebRTC gathers zero ICE candidates when two phones play over a hotspot with no internet access.
+    private final class LocalNetwork {
+        @JavascriptInterface public void bindWifi() { runOnUiThread(MainActivity.this::startLocalWifiBind); }
+        @JavascriptInterface public void unbindWifi() { runOnUiThread(MainActivity.this::stopLocalWifiBind); }
+    }
+    private void startLocalWifiBind() {
+        stopLocalWifiBind();
+        ConnectivityManager cm=(ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
+        if (cm==null) return;
+        NetworkRequest request=new NetworkRequest.Builder()
+            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .removeCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build();
+        localWifiCallback=new ConnectivityManager.NetworkCallback() {
+            @Override public void onAvailable(Network network) { cm.bindProcessToNetwork(network); }
+            @Override public void onLost(Network network) { cm.bindProcessToNetwork(null); }
+        };
+        try { cm.requestNetwork(request,localWifiCallback); } catch (Exception ignored) { localWifiCallback=null; }
+    }
+    private void stopLocalWifiBind() {
+        if (localWifiCallback==null) return;
+        ConnectivityManager cm=(ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
+        if (cm!=null) { try { cm.unregisterNetworkCallback(localWifiCallback); } catch (Exception ignored) {} cm.bindProcessToNetwork(null); }
+        localWifiCallback=null;
+    }
     private final class FileExport {
         @JavascriptInterface public void save(String name,String mime,String encoded) {
             if (name==null || encoded==null || encoded.length()>12_000_000) return;
@@ -71,6 +103,6 @@ public final class MainActivity extends BridgeActivity {
     }
     @Override public void onStop() { if (web!=null) web.evaluateJavascript("window.__pauseGame?.()",null); super.onStop(); }
     @Override public void onResume() { super.onResume(); if (web!=null) web.evaluateJavascript("window.__resumeGame?.()",null); }
-    @Override public void onDestroy() { if (web!=null) web.removeJavascriptInterface("AndroidFiles"); super.onDestroy(); }
+    @Override public void onDestroy() { if (web!=null) web.removeJavascriptInterface("AndroidFiles"); stopLocalWifiBind(); super.onDestroy(); }
     WebView gameView() { return web; }
 }
