@@ -11,7 +11,7 @@ $('pane-bot').insertAdjacentHTML('beforeend','<p id="checkersRules" class="check
 function socialStatus(text){$('socialStatus').textContent=text}
 function paintProfile(){ $('profileName').textContent=localProfile.name||'Войти как гость' }
 function showProfile(){ $('playerName').value=localProfile.guest?'':localProfile.name;$('profileError').textContent='';$('profileDialog').showModal() }
-async function saveProfile(name,guest){name=cleanName(name);if(!name){$('profileError').textContent='Введите имя или войдите гостем';return}localProfile.name=name;localProfile.guest=guest;try{localStorage.setItem('board-profile',JSON.stringify(localProfile))}catch(e){}$('profileDialog').close();paintProfile();render();if(social?.user)await social.rename(name).catch(e=>socialStatus(e.message));if(net.connected&&net.role!=='firebase')net.channel.send(JSON.stringify({type:'profile',name}));if(navigator.onLine)ensureSocial().catch(e=>socialStatus(e.message));}
+async function saveProfile(name,guest){name=cleanName(name);if(!name){$('profileError').textContent='Введите имя или войдите гостем';return}localProfile.name=name;localProfile.guest=guest;try{localStorage.setItem('board-profile',JSON.stringify(localProfile))}catch(e){}$('profileDialog').close();paintProfile();render();if(social?.user)await social.rename(name).catch(e=>socialStatus(e.message));if(net.connected&&net.role!=='firebase')net.channel.send(JSON.stringify({type:'profile',name}));}
 $('profileForm').onsubmit=e=>{e.preventDefault();saveProfile($('playerName').value,false)};
 $('guestLogin').onclick=()=>saveProfile(localProfile.guest&&localProfile.name?localProfile.name:'Гость '+Math.floor(1000+Math.random()*9000),true);
 $('profileButton').onclick=showProfile;
